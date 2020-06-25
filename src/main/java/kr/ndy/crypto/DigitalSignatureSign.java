@@ -7,44 +7,34 @@ import java.security.*;
 
 public class DigitalSignatureSign implements ICryptoEncoder {
 
-    private String str;
-    private Key privateKey, publicKey;
+    private String data;
+    private Key privateKey;
 
-    public DigitalSignatureSign(String test, Key privateKey, Key publicKey)
+    public DigitalSignatureSign(String data, Key privateKey)
     {
-        this.str = test;
+        this.data = data;
         this.privateKey = privateKey;
-        this.publicKey = publicKey;
     }
 
     @Override
     public byte[] encode()
     {
+        byte[] signed = null;
+
         try
         {
-            /** 전자 서명 */
-
             Signature signature= Signature.getInstance("SHA1withECDSA");
             signature.initSign((PrivateKey) privateKey);
 
-            byte[] arr = str.getBytes("UTF-8");
-            byte[] arr2;
+            byte[] arr = data.getBytes("UTF-8");
+
             signature.update(arr);
-            arr2 = signature.sign();
-
-            System.out.println("서명: 0x" + new BigInteger(1, arr2).toString(16));
-
-            Signature v = Signature.getInstance("SHA1withECDSA");
-            v.initVerify((PublicKey) publicKey);
-            v.update(arr);
-
-            boolean result = v.verify(arr2);
-            System.out.println("퍼블릭 서명: " + result);
+            signed = signature.sign();
         } catch (Exception e)
         {
             e.printStackTrace();
         }
-        return new byte[0];
+        return signed;
     }
 
     @Override

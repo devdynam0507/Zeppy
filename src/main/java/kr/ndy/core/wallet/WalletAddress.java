@@ -2,6 +2,7 @@ package kr.ndy.core.wallet;
 
 import kr.ndy.crypto.*;
 
+import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.PublicKey;
@@ -23,10 +24,11 @@ public class WalletAddress {
 
     public Key getPrivateKey() { return privateKey; }
     public Key getPublicKey() { return publicKey; }
+    public String getWalletAddress() { return walletAddress; }
 
     public String toHexString(byte[] key)
     {
-        return new SHA256(key).toHexString(key);
+        return new BigInteger(1, key).toString(16);
     }
 
     public String toBase64String()
