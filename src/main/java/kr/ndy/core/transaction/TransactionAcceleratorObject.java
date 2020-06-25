@@ -24,8 +24,6 @@ public class TransactionAcceleratorObject {
         this.signedStr = signedStr;
         this.pubKey = new PublicKeyDecoder(pubKey).decode();
         this.txJsonWithBase64 = txJsonWithBase64;
-
-        System.out.println("PublicKey: " + new BigInteger(this.pubKey.getEncoded()).toString(16));
     }
 
     public String getAcc() { return acc; }
