@@ -13,8 +13,6 @@ public class Block {
     {
         this.version = BlockSchema.BLOCK_VERSION;
         this.difficulty = BlockSchema.BLOCK_DIFFICULTY;
-
-
     }
 
 }
