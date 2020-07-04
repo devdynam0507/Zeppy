@@ -5,8 +5,7 @@ import kr.ndy.crypto.SHA256;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class MerkleTree {
 
@@ -20,6 +19,7 @@ public class MerkleTree {
     public synchronized void add(Transaction transaction) {
         try
         {
+            System.out.println("tx hash: " + new BigInteger(new SHA256(transaction.getTxInfo().toJson().getBytes("UTF-8")).encode()).toString(16));
             transactionHashList.add(new SHA256(transaction.getTxInfo().toJson().getBytes("UTF-8")).encode());
         } catch (UnsupportedEncodingException e)
         {
@@ -27,35 +27,119 @@ public class MerkleTree {
         }
     }
 
-    public List<byte[]> toMerkleTree()
+    public byte[][] toMerkleTree()
     {
         int txListSize = transactionHashList.size();
-        boolean bSizeOfOdd = txListSize == 1 || txListSize % 2 == 0 ? false : true;
-        int merkleTreeSize = bSizeOfOdd ? txListSize * 2 : txListSize * 2 - 1;
-        List<byte[]> merkleTree = new ArrayList<>(merkleTreeSize);
+        int merkleTreeSize = txListSize * 2;
+        byte[][] merkleTree = new byte[merkleTreeSize][];
         int j = txListSize;
 
-        transactionHashList.forEach(hash -> merkleTree.add(hash));
-
-        for(int i = 0; i < merkleTreeSize - 1; i += 2)
+        for(int i = 0; i < txListSize; i++)
         {
-            byte[] hash1 = merkleTree.get(i);
-            byte[] hash2 = merkleTree.get(i + 1);
-            byte[] merged;
+            merkleTree[i] = transactionHashList.get(i);
+        }
 
-            if(bSizeOfOdd && hash2 == null)
+        for(int i = 0; i < merkleTreeSize - 2; i += 2)
+        {
+            boolean bOddCondition = (i < txListSize && i + 1 >= txListSize);
+            byte[] hash1 = merkleTree[i];
+            byte[] hash2 = bOddCondition ? hash1 : merkleTree[i + 1];
+            byte[] merged = merge(hash1, hash2);
+
+            System.out.println("hash1: " + new BigInteger(merkleTree[i]).toString(16));
+            System.out.println("hash2: " + new BigInteger(hash2).toString(16));
+            System.out.println();
+            System.out.println("build merged{j}: ".replace("{j}", j + "") + new BigInteger(merged).toString(16));
+            System.out.println("i:" + i);
+            System.out.println();
+
+            if(bOddCondition)
             {
-                merged = merge(hash1, hash1);
-            } else
-            {
-                merged = merge(hash1, hash2);
+                i -= 1;
             }
 
-            merkleTree.add(j, merged);
+            merkleTree[j] = merged;
             ++j;
         }
 
         return merkleTree;
+    }
+
+    public byte[] verify(byte[][] merkleTree, byte[] target)
+    {
+        int merkleTreeSize = merkleTree.length * 2;
+        int txListSize = transactionHashList.size();
+        byte[] root = null;
+            /*
+            * 1cdbe7659e659204e482168e498168e27e3776c8fe47b89e0b2a74acccbc5a56 -637266c6c679f896c059ed3f437fabbaa231c64d229b5d1f7569ef683f28c4ce 33e64f533625445d496c7c8a60bac3fbf706888f6faef10f4cb8cfea8d60395a 3fb9edd2cce4c0d4ada80e603bc53ca4c441184c5e4af432672248857c88d29f 21e457f703fa5439b31ecdd320d3747f4bf667aab6575a30e0d8ef2295d192d 845cf90da5d287ec3d5335f04e75003035d4780883021e1640fbdd4f9ddd16d -3396c3879fcf2c08da1180fff63d60a3af2450fd6d34b4883e82b3bfcae98964
+                                         14c4cd14e415e051149b96f87ffefccee48046423cfe9e957ef40dc5d6eb7cd2 10eddf510efe320bc092a0dc957bfb1e9025cb4400708b2429fc5f57a78ae5f4 5703058d2e70c6382f139645a6deb66671041a0f9fe5af62045ffc3b49af2d72 -6c5ca13e6ab016f8374d02af343b943811391f2e4905c3631f9a2ac887d029d7
+                                                                         754a285107e177b7dbb64f42bbc907881a3ea45ee5f586ac2a08bd1a3a7b236b                                                       -6a73c8032d888124cf06267a77a11674fc1b08e9ce1f27774421fab960b9de8b
+            5753e29569d37e22978d4a4652d81a4ae75975244cd5b0318f0f2688abeb8e90
+
+            * */
+
+        for(int i = 0; i < merkleTreeSize - 2; i += 2)
+        {
+            boolean bOddCondition = (i < txListSize && i + 1 >= txListSize);
+
+            if (Objects.deepEquals(merkleTree[i], target)) {
+                if(i + 1 >= merkleTreeSize)
+                {
+                    break;
+                }
+                target = merge(target, merkleTree[i + 1]);
+            }
+            if (Objects.deepEquals(merkleTree[i + 1], target)) {
+                target = merge(merkleTree[i], target);
+            }
+
+
+            if(bOddCondition)
+            {
+                --i;
+            }
+
+            root = target;
+
+            if(Objects.deepEquals(root, merkleTree[merkleTree.length - 1]))
+            {
+                break;
+            }
+            System.out.println("root: " + new BigInteger(root).toString(16));
+        }
+
+        return root;
+    }
+
+    public boolean validation(byte[] target)
+    {
+        byte[][] merkleTree = toMerkleTree();
+        boolean result;
+
+        byte[] verify = verify(merkleTree, target);
+        System.out.println(new BigInteger(merkleTree[merkleTree.length -1]).toString(16));
+        System.out.println(new BigInteger(verify).toString(16));
+
+        result = Objects.deepEquals(merkleTree[merkleTree.length - 1], verify);
+
+        return result;
+    }
+
+    private int indexOf(byte[][] merkleTree, byte[] target)
+    {
+        int index;
+        boolean bFind = false;
+
+        for(index = 0 ; index < merkleTree.length; index++)
+        {
+            if(Objects.deepEquals(target, merkleTree[index]))
+            {
+                bFind = true;
+                break;
+            }
+        }
+
+        return bFind ? index : -1;
     }
 
     /*
@@ -65,35 +149,42 @@ public class MerkleTree {
     *        o     o     o   o
     *       o  o  o  o  o o o o
     *
+    *
+    *
+    *                     o
+    *             o             o
+    *         o       o       o   o
+    *       o   o   o   o   o   o   o
+    *
     * */
-    public void print(List<byte[]> merkleTree)
+    public void print(byte[][] merkleTree)
     {
         int j = transactionHashList.size();
         int mkSize = j;
         int p = 4;
         int i = 0;
 
-        for(i = 0; i < 8; i++)
+        for(i = 0; i < 7; i++)
         {
-            String hex = new BigInteger(merkleTree.get(i)).toString(16);
+            String hex = new BigInteger(merkleTree[i]).toString(16);
             System.out.print(hex + " ");
         }
         System.out.println();
-        for(; i < 12; i++)
+        for(; i < 11; i++)
         {
-            String hex = new BigInteger(merkleTree.get(i)).toString(16);
+            String hex = new BigInteger(merkleTree[i]).toString(16);
+            System.out.print(hex + " ");
+        }
+        System.out.println();
+        for(; i < 13; i++)
+        {
+            String hex = new BigInteger(merkleTree[i]).toString(16);
             System.out.print(hex + " ");
         }
         System.out.println();
         for(; i < 14; i++)
         {
-            String hex = new BigInteger(merkleTree.get(i)).toString(16);
-            System.out.print(hex + " ");
-        }
-        System.out.println();
-        for(; i < 15; i++)
-        {
-            String hex = new BigInteger(merkleTree.get(i)).toString(16);
+            String hex = new BigInteger(merkleTree[i]).toString(16);
             System.out.print(hex + " ");
         }
         System.out.println();
@@ -109,10 +200,11 @@ public class MerkleTree {
 
     public byte[] merge(byte[] arr1, byte[] arr2)
     {
-        byte[] merged = new byte[arr1.length + arr2.length];
+        BigInteger integer1 = new BigInteger(arr1);
+        BigInteger integer2 = new BigInteger(arr2);
+        integer1.add(integer2);
 
-        System.arraycopy(arr1, 0, merged, 0, arr1.length - 1);
-        System.arraycopy(arr2, 0, merged, arr1.length, arr2.length - 1);
+        byte[] merged = integer1.toByteArray();
 
         return new SHA256(merged).encode();
     }
