@@ -7,21 +7,6 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.*;
 
-/*
- *
- *                o
- *           o         o
- *        o     o     o   o
- *       o  o  o  o  o o o o
- *
- *
- *
- *                     o
- *             o             o
- *         o       o       o   o
- *       o   o   o   o   o   o   o
- *
- * */
 public class MerkleTree {
 
     private List<byte[]> transactionHashList;
@@ -34,7 +19,6 @@ public class MerkleTree {
     public synchronized void add(Transaction transaction) {
         try
         {
-            System.out.println("tx hash: " + new BigInteger(new SHA256(transaction.getTxInfo().toJson().getBytes("UTF-8")).encode()).toString(16));
             transactionHashList.add(new SHA256(transaction.getTxInfo().toJson().getBytes("UTF-8")).encode());
         } catch (UnsupportedEncodingException e)
         {
@@ -61,13 +45,6 @@ public class MerkleTree {
             byte[] hash2 = bOddCondition ? hash1 : merkleTree[i + 1];
             byte[] merged = merge(hash1, hash2);
 
-            System.out.println("hash1: " + new BigInteger(merkleTree[i]).toString(16));
-            System.out.println("hash2: " + new BigInteger(hash2).toString(16));
-            System.out.println();
-            System.out.println("build merged{j}: ".replace("{j}", j + "") + new BigInteger(merged).toString(16));
-            System.out.println("i:" + i);
-            System.out.println();
-
             if(bOddCondition)
             {
                 i -= 1;
@@ -80,84 +57,100 @@ public class MerkleTree {
         return merkleTree;
     }
 
-    public List<byte[]> getMerkleBranch(byte[][] merkleTree, int index)
+    private List<Integer> getMerkleBranch(int index)
     {
-        int treeSize = transactionHashList.size();
-        List<byte[]> branch = new ArrayList<>();
+        int treeSize = transactionHashList.size() - 1;
+        List<Integer> branch = new ArrayList<>();
         int j = 0;
 
         for(int i = treeSize; i > 1; i = (i + 1) / 2)
         {
             int d = Math.min(index ^ 1, treeSize - 1);
-            branch.add(merkleTree[j + d]);
+            int idx = j + d;
+            branch.add(idx);
             index >>= 1;
             j += i;
+
+            if(idx < 0)
+            {
+                branch.clear();
+                break;
+            }
         }
-        System.out.println("indexof:" + index);
 
         return branch;
     }
 
-    public byte[] verify(byte[][] merkleTree, byte[] target)
+    private List<Integer> getBranchCouple(List<Integer> branch, byte[][] merkleTree)
     {
         int merkleTreeSize = merkleTree.length * 2;
-        int txListSize = transactionHashList.size();
-        byte[] root = null;
-        List<byte[]> branch = getMerkleBranch(merkleTree, indexOf(merkleTree, target));
+        List<Integer> coupleIndex = new ArrayList<>();
+        boolean bSelfHash = false;
 
-        for(byte[] arr : branch)
+        for(int i = 0; i < merkleTreeSize - 2; i += 2)
         {
-            System.out.println("branchIndex: " + indexOf(merkleTree, arr));
+            boolean bContainsInBranch = branch.contains(i);
+
+            if(!bSelfHash && i > transactionHashList.size())
+            {
+                --i;
+                bSelfHash = true;
+            }
+            if(bContainsInBranch)
+            {
+                coupleIndex.add(i + 1);
+            }else if(branch.contains(i + 1))
+            {
+                coupleIndex.add(i);
+            }
+        }
+
+        return coupleIndex;
+    }
+
+    /**
+     * @return merkle root
+     * */
+    private byte[] verify(byte[][] merkleTree, byte[] target)
+    {
+        byte[] root = null;
+        List<Integer> branch = getMerkleBranch(indexOf(merkleTree, target));
+        List<Integer> coupleBranch = getBranchCouple(branch, merkleTree);
+        int index = indexOf(merkleTree, target);
+
+        for(int i = 0; i < branch.size(); i++)
+        {
+            int branchIndex = branch.get(i);
+            int coupleBranchIndex = coupleBranch.get(i);
+
+            if(root == null)
+            {
+                root = merge(merkleTree[Math.min(branchIndex, coupleBranchIndex)], merkleTree[Math.max(branchIndex, coupleBranchIndex)]);
+            }else
+            {
+                if((index & 1) == 1)
+                {
+                    root = merge(merkleTree[branchIndex], merkleTree[coupleBranchIndex]);
+                }else
+                {
+                    root = merge(merkleTree[coupleBranchIndex], merkleTree[branchIndex]);
+                }
+            }
+
+            index >>= 1;
         }
 
         return root;
     }
 
-    public boolean validation(byte[] target)
-    {
+    /**
+     * @return target hashing to tree top and equals merkle root
+     * */
+    public boolean validation(byte[] target) {
         byte[][] merkleTree = toMerkleTree();
-        boolean result;
-
         byte[] verify = verify(merkleTree, target);
-        System.out.println(new BigInteger(merkleTree[merkleTree.length - 1]).toString(16));
-        System.out.println(new BigInteger(verify).toString(16));
 
-        result = Objects.deepEquals(merkleTree[merkleTree.length - 1], verify);
-
-        return result;
-    }
-
-    public void print(byte[][] merkleTree)
-    {
-        int j = transactionHashList.size();
-        int mkSize = j;
-        int p = 4;
-        int i = 0;
-
-        for(i = 0; i < 7; i++)
-        {
-            String hex = new BigInteger(merkleTree[i]).toString(16);
-            System.out.print(hex + " ");
-        }
-        System.out.println();
-        for(; i < 11; i++)
-        {
-            String hex = new BigInteger(merkleTree[i]).toString(16);
-            System.out.print(hex + " ");
-        }
-        System.out.println();
-        for(; i < 13; i++)
-        {
-            String hex = new BigInteger(merkleTree[i]).toString(16);
-            System.out.print(hex + " ");
-        }
-        System.out.println();
-        for(; i < 14; i++)
-        {
-            String hex = new BigInteger(merkleTree[i]).toString(16);
-            System.out.print(hex + " ");
-        }
-        System.out.println();
+        return verify != null && Objects.deepEquals(merkleTree[merkleTree.length - 1], verify);
     }
 
     private int indexOf(byte[][] merkleTree, byte[] target)
@@ -177,7 +170,7 @@ public class MerkleTree {
         return bFind ? index : -1;
     }
 
-    public byte[] merge(byte[] arr1, byte[] arr2)
+    private byte[] merge(byte[] arr1, byte[] arr2)
     {
         byte[] merged = new byte[arr1.length + arr2.length];
 
