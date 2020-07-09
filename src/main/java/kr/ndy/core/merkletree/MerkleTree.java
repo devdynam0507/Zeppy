@@ -4,7 +4,6 @@ import kr.ndy.core.transaction.Transaction;
 import kr.ndy.crypto.SHA256;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.util.*;
 
 public class MerkleTree {
@@ -16,7 +15,7 @@ public class MerkleTree {
         this.transactionHashList = new ArrayList<>();
     }
 
-    public synchronized void add(Transaction transaction) {
+    public void add(Transaction transaction) {
         try
         {
             transactionHashList.add(new SHA256(transaction.getTxInfo().toJson().getBytes("UTF-8")).encode());

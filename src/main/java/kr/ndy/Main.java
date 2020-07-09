@@ -1,6 +1,7 @@
 package kr.ndy;
 
-import kr.ndy.core.merkletree.MerkleTree;
+import kr.ndy.core.blockchain.generator.BlockGenerator;
+import kr.ndy.core.blockchain.BlockHeader;
 import kr.ndy.core.transaction.Transaction;
 import kr.ndy.core.transaction.TransactionAccelerator;
 import kr.ndy.core.transaction.TransactionBuilder;
@@ -12,16 +13,17 @@ import kr.ndy.crypto.DigitalSignatureVerify;
 import kr.ndy.crypto.SHA256;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import java.math.BigInteger;
 import java.security.Security;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
+
+    public static BlockGenerator generator;
 
     public static void main(String... args) throws Exception
     {
         Security.addProvider(new BouncyCastleProvider());
+        generator = new BlockGenerator();
+
         Wallet wallet1 = WalletGenerator.create();
         WalletAddress address1 = wallet1.getAddress();
 
@@ -52,6 +54,14 @@ public class Main {
         boolean bVerify = dsv.decode();
 
         System.out.println("verify:" + bVerify);
+
+        BlockHeader header = new BlockHeader(null);
+
+        while(true)
+        {
+            header.updateNonce();
+            System.out.println(new SHA256(null).toHexString(header.getBlockInfo().hash()));
+        }
     }
 
 }
