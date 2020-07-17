@@ -3,6 +3,7 @@ package kr.ndy.core.blockchain;
 import kr.ndy.crypto.SHA256;
 import kr.ndy.util.ByteUtil;
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -20,9 +21,7 @@ public class BlockInfo {
         byte[] arr = new byte[24];
 
         copy(arr);
-        arr = digest(arr);
         arr = new SHA256(arr).encode();
-        arr = digest(arr);
         arr = new SHA256(arr).encode();
 
         return arr;
@@ -34,7 +33,7 @@ public class BlockInfo {
 
         try
         {
-            digest = MessageDigest.getInstance("MD5");
+            digest = MessageDigest.getInstance("SHA-256");
 
             digest.update(arr);
         } catch (NoSuchAlgorithmException e)
@@ -47,10 +46,12 @@ public class BlockInfo {
 
     private void copy(byte[] arr)
     {
-        System.arraycopy(arr, 0, ByteUtil.toByte(block.getVersion()), 0, 4);
-        System.arraycopy(arr, 4, ByteUtil.toByte(block.getNonce()), 0, 8);
-        System.arraycopy(arr, 12, ByteUtil.toByte(block.getDifficulty()), 0, 4);
-        System.arraycopy(arr, 16, ByteUtil.toByte(block.getTime()), 0, 8);
+        System.arraycopy(ByteUtil.toByte(block.getVersion()), 0, arr, 0, 4);
+        System.arraycopy(ByteUtil.toByte(block.getNonce()), 0, arr, 4, 8);
+        System.arraycopy(ByteUtil.toByte(block.getDifficulty()), 0, arr, 12, 4);
+        System.arraycopy(ByteUtil.toByte(block.getTime()), 0, arr, 16, 8);
+
+        System.out.println(new BigInteger(arr).toString(16));
     }
 
 }

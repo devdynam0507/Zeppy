@@ -1,8 +1,8 @@
 package kr.ndy.core.blockchain.generator;
 
-import java.util.TimerTask;
+import kr.ndy.core.ZeppyModule;
 
-public class BlockGeneratorTask extends TimerTask {
+public class BlockGeneratorTask extends Thread {
 
     private BlockGenerator generator;
     private static final int MAX_TX_LENGTH = 999;
@@ -15,13 +15,20 @@ public class BlockGeneratorTask extends TimerTask {
     @Override
     public void run()
     {
-        int txLen = getGenerator().getCurrentBlock().getMerkleTree().toMerkleTree().length;
+        System.out.println("tx");
+        int txLen = 0;
+
+        if(generator.getCurrentBlock() == null)
+        {
+            generator.createNewBlock();
+        }
+
+        txLen = generator.getCurrentBlock().getMerkleTree().toMerkleTree().length;
 
         if(txLen >= MAX_TX_LENGTH)
         {
-            //TODO: Block Mining pool로 이동 (서버간)
+            ZeppyModule.getInstance().getMiningPool().addPool(generator.getCurrentBlock());
         }
     }
 
-    public synchronized BlockGenerator getGenerator() { return generator; }
 }

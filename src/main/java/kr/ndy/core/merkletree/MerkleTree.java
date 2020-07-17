@@ -32,25 +32,28 @@ public class MerkleTree {
         byte[][] merkleTree = new byte[merkleTreeSize][];
         int j = txListSize;
 
-        for(int i = 0; i < txListSize; i++)
+        if(txListSize > 4)
         {
-            merkleTree[i] = transactionHashList.get(i);
-        }
-
-        for(int i = 0; i < merkleTreeSize - 2; i += 2)
-        {
-            boolean bOddCondition = (i < txListSize && i + 1 >= txListSize);
-            byte[] hash1 = merkleTree[i];
-            byte[] hash2 = bOddCondition ? hash1 : merkleTree[i + 1];
-            byte[] merged = merge(hash1, hash2);
-
-            if(bOddCondition)
+            for(int i = 0; i < txListSize; i++)
             {
-                i -= 1;
+                merkleTree[i] = transactionHashList.get(i);
             }
 
-            merkleTree[j] = merged;
-            ++j;
+            for(int i = 0; i < merkleTreeSize - 2; i += 2)
+            {
+                boolean bOddCondition = (i < txListSize && i + 1 >= txListSize);
+                byte[] hash1 = merkleTree[i];
+                byte[] hash2 = bOddCondition ? hash1 : merkleTree[i + 1];
+                byte[] merged = merge(hash1, hash2);
+
+                if(bOddCondition)
+                {
+                    i -= 1;
+                }
+
+                merkleTree[j] = merged;
+                ++j;
+            }
         }
 
         return merkleTree;

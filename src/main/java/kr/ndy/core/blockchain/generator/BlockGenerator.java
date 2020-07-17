@@ -8,12 +8,12 @@ public class BlockGenerator {
     private BlockHeader currentBlock;
     private BlockHeader previousBlock;
 
-    public void createNewBlock()
+    public synchronized void createNewBlock()
     {
         this.currentBlock = new BlockHeader(null);
     }
 
-    public void addTransaction(Transaction transaction)
+    public synchronized void addTransaction(Transaction transaction)
     {
         currentBlock.getMerkleTree().add(transaction);
     }

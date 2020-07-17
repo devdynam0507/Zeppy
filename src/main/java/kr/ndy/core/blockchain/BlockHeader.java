@@ -35,6 +35,7 @@ public class BlockHeader {
     public int getVersion() { return version; }
     public MerkleTree getMerkleTree() { return merkleTree; }
     public String getTimeStamp() { return timeStamp; }
+    public BlockPOW getPow() { return new BlockPOW(this); }
 
     public BlockInfo getBlockInfo() { return new BlockInfo(this); }
 
