@@ -1,6 +1,10 @@
 package kr.ndy.core.blockchain;
 
 import kr.ndy.core.merkletree.MerkleTree;
+import kr.ndy.core.transaction.TransactionBuilder;
+import kr.ndy.core.wallet.Wallet;
+import kr.ndy.core.wallet.WalletAddress;
+import kr.ndy.core.wallet.WalletGenerator;
 import kr.ndy.util.DateUtil;
 
 import java.util.Date;
@@ -49,6 +53,29 @@ public class BlockHeader {
         byte[][] merkleTree = getMerkleTree().toMerkleTree();
 
         return merkleTree[merkleTree.length - 1];
+    }
+
+    public void test()
+    {
+        Wallet wallet1 = WalletGenerator.create();
+        WalletAddress address1 = wallet1.getAddress();
+
+        Wallet wallet2 = WalletGenerator.create();
+        WalletAddress address2 = wallet2.getAddress();
+
+        for(int i = 0; i < 999; i++)
+        {
+            merkleTree.add(TransactionBuilder.builder().amount(0.5).receiver(address1.getWalletAddress()).sender(address2.getWalletAddress())
+                                    .senderPrivateKey(address1.toHexString(address1.getPrivateKey().getEncoded()))
+                .senderPublicKey(address1.toHexString(address1.getPublicKey().getEncoded())).build());
+        }
+
+        previousHash = new byte[32];
+
+        for(int i = 0; i < 32; i++)
+        {
+            previousHash[i] = 0x00;
+        }
     }
 
     public void updateNonce()

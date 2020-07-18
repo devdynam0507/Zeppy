@@ -25,7 +25,10 @@ public class Main {
         Security.addProvider(new BouncyCastleProvider());
         ZeppyModule.getInstance().executeModuleTasks();
 
-        BlockPOW pow = new BlockPOW(new BlockHeader(null));
+        BlockHeader header = new BlockHeader(null);
+        header.test();
+
+        BlockPOW pow = new BlockPOW(header);
 
         while(true)
         {

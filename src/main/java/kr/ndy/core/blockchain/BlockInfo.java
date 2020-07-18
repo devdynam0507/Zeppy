@@ -18,11 +18,14 @@ public class BlockInfo {
 
     public byte[] hash()
     {
-        byte[] arr = new byte[24];
+        byte[] prevHash = ByteUtil.toLittleEndian(block.getPreviousHash());
+        byte[] merkleRoot = ByteUtil.toLittleEndian(block.getMerkleRoot());
+        byte[] arr = new byte[24 + prevHash.length + merkleRoot.length];
 
-        copy(arr);
-        arr = new SHA256(arr).encode();
-        arr = new SHA256(arr).encode();
+        copy(arr, prevHash, merkleRoot);
+        arr = new BigInteger(arr).toByteArray();
+        arr = digest(digest(arr));
+        System.out.println(new BigInteger(arr).toString(16));
 
         return arr;
     }
@@ -44,14 +47,17 @@ public class BlockInfo {
         return digest.digest();
     }
 
-    private void copy(byte[] arr)
+    private void copy(byte[] arr, byte[] prevHash, byte[] merkleRoot)
     {
-        System.arraycopy(ByteUtil.toByte(block.getVersion()), 0, arr, 0, 4);
-        System.arraycopy(ByteUtil.toByte(block.getNonce()), 0, arr, 4, 8);
-        System.arraycopy(ByteUtil.toByte(block.getDifficulty()), 0, arr, 12, 4);
-        System.arraycopy(ByteUtil.toByte(block.getTime()), 0, arr, 16, 8);
+        int sum = prevHash.length + merkleRoot.length;
 
-        System.out.println(new BigInteger(arr).toString(16));
+        System.arraycopy(merkleRoot, 0, arr, 0, merkleRoot.length);
+        System.arraycopy(prevHash, 0, arr,  merkleRoot.length, prevHash.length);
+        System.arraycopy(ByteUtil.toByte(block.getVersion()), 0, arr, sum, 4);
+        System.arraycopy(ByteUtil.toByte(block.getNonce()), 0, arr, sum + 4, 8);
+        System.arraycopy(ByteUtil.toByte(block.getDifficulty()), 0, arr, sum + 4 + 8, 4);
+        System.arraycopy(ByteUtil.toByte(block.getTime()), 0, arr, sum + 4 + 8 + 4, 8);
+
     }
 
 }

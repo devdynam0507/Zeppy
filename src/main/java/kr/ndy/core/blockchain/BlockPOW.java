@@ -27,7 +27,7 @@ public class BlockPOW extends Thread {
     {
         header.updateNonce();
         BlockInfo blockInfo = new BlockInfo(header);
-        System.out.println(blockInfo.hash());
+        blockInfo.hash();
 
         return false;
     }

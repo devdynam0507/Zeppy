@@ -1,5 +1,8 @@
 package kr.ndy.util;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 public class ByteUtil {
 
     public static byte[] toByte(int a)
@@ -28,6 +31,20 @@ public class ByteUtil {
         arr[0] = (byte) a;
 
         return arr;
+    }
+
+    public static byte[] toLittleEndian(byte[] arr)
+    {
+        ByteBuffer byteBuffer = ByteBuffer.wrap(arr);
+        ByteBuffer destBuffer = ByteBuffer.allocate(arr.length);
+        destBuffer.order(ByteOrder.LITTLE_ENDIAN);
+
+        while(byteBuffer.hasRemaining())
+        {
+            destBuffer.put(byteBuffer.get());
+        }
+
+        return destBuffer.array();
     }
 
 }

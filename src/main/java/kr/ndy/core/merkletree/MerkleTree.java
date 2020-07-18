@@ -15,7 +15,7 @@ public class MerkleTree {
         this.transactionHashList = new ArrayList<>();
     }
 
-    public void add(Transaction transaction) {
+    public synchronized void add(Transaction transaction) {
         try
         {
             transactionHashList.add(new SHA256(transaction.getTxInfo().toJson().getBytes("UTF-8")).encode());
@@ -58,6 +58,8 @@ public class MerkleTree {
 
         return merkleTree;
     }
+
+    public int getSize() { return transactionHashList.size(); }
 
     private List<Integer> getMerkleBranch(int index)
     {
