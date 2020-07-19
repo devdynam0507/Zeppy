@@ -23,9 +23,10 @@ public class BlockInfo {
         byte[] arr = new byte[24 + prevHash.length + merkleRoot.length];
 
         copy(arr, prevHash, merkleRoot);
-        arr = new BigInteger(arr).toByteArray();
-        arr = digest(digest(arr));
-        System.out.println(new BigInteger(arr).toString(16));
+        arr = new SHA256(arr).encode();
+        arr = new SHA256(arr).encode();
+
+        System.out.println(new SHA256(null).toHexString(arr));
 
         return arr;
     }

@@ -3,6 +3,7 @@ package kr.ndy.core;
 import kr.ndy.core.blockchain.generator.BlockGenerator;
 import kr.ndy.core.blockchain.generator.BlockGeneratorTask;
 import kr.ndy.core.blockchain.generator.BlockMiningPool;
+import kr.ndy.core.blockchain.observer.BlockObserverManager;
 
 import java.util.concurrent.TimeUnit;
 
@@ -13,6 +14,7 @@ public class ZeppyModule {
     private BlockGenerator generator;
     private BlockGeneratorTask generatorTask;
     private BlockMiningPool miningPool;
+    private BlockObserverManager blockObserverManager;
 
     private ZeppyModule()
     {}
@@ -23,6 +25,7 @@ public class ZeppyModule {
         {
             instance = new ZeppyModule();
             instance.initialize();
+            instance.registerObservers();
         }
 
         return instance;
@@ -33,6 +36,7 @@ public class ZeppyModule {
         this.generator = new BlockGenerator();
         this.generatorTask = new BlockGeneratorTask(generator);
         this.miningPool = new BlockMiningPool();
+        this.blockObserverManager = new BlockObserverManager();
     }
 
     public void executeModuleTasks()
@@ -41,7 +45,13 @@ public class ZeppyModule {
         ZeppyThreadPoolManager.getInstance().service(miningPool, 0, 1, TimeUnit.SECONDS);
     }
 
+    public void registerObservers()
+    {
+        blockObserverManager.addObserver(miningPool);
+    }
+
     public BlockGenerator getBlockGenerator() { return generator; }
+    public BlockObserverManager getBlockObserverManager() { return blockObserverManager; }
 
     ////////////////////////////////////////////// Threads //////////////////////////////////////////////
     public BlockMiningPool getMiningPool() { return miningPool; }

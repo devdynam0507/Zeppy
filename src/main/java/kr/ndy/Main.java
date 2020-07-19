@@ -5,6 +5,8 @@ import kr.ndy.core.ZeppyThreadPoolManager;
 import kr.ndy.core.blockchain.BlockPOW;
 import kr.ndy.core.blockchain.generator.BlockGenerator;
 import kr.ndy.core.blockchain.BlockHeader;
+import kr.ndy.core.blockchain.generator.BlockMinerClient;
+import kr.ndy.core.blockchain.generator.BlockMiningPool;
 import kr.ndy.core.transaction.Transaction;
 import kr.ndy.core.transaction.TransactionAccelerator;
 import kr.ndy.core.transaction.TransactionBuilder;
@@ -20,20 +22,11 @@ import java.security.Security;
 
 public class Main {
 
-    public static void main(String... args) throws Exception
+    public static void main(String... args)
     {
         Security.addProvider(new BouncyCastleProvider());
         ZeppyModule.getInstance().executeModuleTasks();
 
-        BlockHeader header = new BlockHeader(null);
-        header.test();
-
-        BlockPOW pow = new BlockPOW(header);
-
-        while(true)
-        {
-            pow.validation();
-        }
 
 //        Wallet wallet1 = WalletGenerator.create();
 //        WalletAddress address1 = wallet1.getAddress();

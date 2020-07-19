@@ -15,15 +15,16 @@ public class BlockGeneratorTask extends Thread {
     @Override
     public void run()
     {
-        System.out.println("tx");
-        int txLen = 0;
+        int txLen;
 
         if(generator.getCurrentBlock() == null)
         {
             generator.createNewBlock();
+            generator.getCurrentBlock().test();
         }
 
         txLen = generator.getCurrentBlock().getMerkleTree().toMerkleTree().length;
+        System.out.println(txLen);
 
         if(txLen >= MAX_TX_LENGTH)
         {

@@ -19,6 +19,7 @@ public class BlockHeader {
     private long nonce;
 
     private BlockBody body;
+    private BlockPOW pow;
 
     public BlockHeader(byte[] previousHash)
     {
@@ -30,6 +31,7 @@ public class BlockHeader {
         this.nonce = 0x00;
 
         this.body = new BlockBody();
+        this.pow = new BlockPOW(this);
     }
 
     public BlockBody getBody() { return body; }
@@ -39,7 +41,7 @@ public class BlockHeader {
     public int getVersion() { return version; }
     public MerkleTree getMerkleTree() { return merkleTree; }
     public String getTimeStamp() { return timeStamp; }
-    public BlockPOW getPow() { return new BlockPOW(this); }
+    public synchronized BlockPOW getPow() { return pow; }
 
     public BlockInfo getBlockInfo() { return new BlockInfo(this); }
 
@@ -78,8 +80,10 @@ public class BlockHeader {
         }
     }
 
-    public void updateNonce()
+    public byte[] updateNonce()
     {
         ++nonce;
+        System.out.println("nonce: " + nonce);
+        return getBlockInfo().hash();
     }
 }

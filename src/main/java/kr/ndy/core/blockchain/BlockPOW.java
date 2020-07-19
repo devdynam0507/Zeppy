@@ -4,7 +4,7 @@ import kr.ndy.crypto.SHA256;
 
 import java.math.BigInteger;
 
-public class BlockPOW extends Thread {
+public class BlockPOW {
 
     private BlockHeader header;
     private byte[] pow;
@@ -18,18 +18,31 @@ public class BlockPOW extends Thread {
      * @param pow POW Result
      *
      * */
-    public synchronized void updatePow(byte[] pow)
+    private void updatePow(byte[] pow)
     {
-        //TODO: Update pow
+        this.pow = pow;
     }
 
     public synchronized boolean validation()
     {
-        header.updateNonce();
-        BlockInfo blockInfo = new BlockInfo(header);
-        blockInfo.hash();
+        byte[] hash = header.updateNonce();
+        int diff = header.getDifficulty();
+        int nBits = 0;
 
-        return false;
+        updatePow(hash);
+
+        for(int i = 0; i < diff; i++)
+        {
+            if(hash[i] == 0X00000000)
+            {
+                ++nBits;
+            } else
+            {
+                break;
+            }
+        }
+
+        return nBits >= diff;
     }
 
     /**
@@ -42,9 +55,7 @@ public class BlockPOW extends Thread {
     }
 
     @Override
-    public void run()
-    {
-        pong(validation());
-        //TODO: Validation POW
+    public String toString() {
+        return new SHA256(null).toHexString(pow);
     }
 }
