@@ -1,7 +1,9 @@
 package kr.ndy.core.blockchain;
 
+import kr.ndy.core.transaction.Transaction;
 import kr.ndy.crypto.SHA256;
 import kr.ndy.util.ByteUtil;
+import org.json.simple.JSONObject;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -26,7 +28,7 @@ public class BlockInfo {
         arr = new SHA256(arr).encode();
         arr = new SHA256(arr).encode();
 
-        System.out.println(String.format("%064x", new BigInteger(1, arr)));
+        System.out.println(ByteUtil.toHex(arr));
 
         return ByteUtil.toLittleEndian(arr);
     }
@@ -48,6 +50,32 @@ public class BlockInfo {
         return digest.digest();
     }
 
+    public String toJson()
+    {
+        JSONObject object = new JSONObject();
+        JSONObject transactions = new JSONObject();
+        BlockBody body = block.getBody();
+
+        object.put("merkle_root", ByteUtil.toHex(block.getMerkleTree().toMerkleTree()[0]));
+        object.put("prev_hash", ByteUtil.toHex(block.getPreviousHash()));
+        object.put("version", block.getVersion());
+        object.put("nonce", block.getNonce());
+        object.put("diff", block.getDifficulty());
+        object.put("time", block.getTime());
+        object.put("fee", body.getFee());
+
+        int i = 0;
+        for(Transaction tx : body.getTransactions())
+        {
+            transactions.put(i + "", tx.getTxInfo().toJson());
+            ++i;
+        }
+
+        object.put("transactions", transactions);
+
+        return object.toJSONString();
+    }
+
     private void copy(byte[] arr, byte[] prevHash, byte[] merkleRoot)
     {
         int sum = prevHash.length + merkleRoot.length;
@@ -58,7 +86,6 @@ public class BlockInfo {
         System.arraycopy(ByteUtil.toByte(block.getNonce()), 0, arr, sum + 4, 8);
         System.arraycopy(ByteUtil.toByte(block.getDifficulty()), 0, arr, sum + 4 + 8, 4);
         System.arraycopy(ByteUtil.toByte(block.getTime()), 0, arr, sum + 4 + 8 + 4, 8);
-
     }
 
 }

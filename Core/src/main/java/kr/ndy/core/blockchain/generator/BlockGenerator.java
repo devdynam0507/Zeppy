@@ -10,7 +10,7 @@ public class BlockGenerator {
 
     public synchronized void createNewBlock()
     {
-        this.currentBlock = new BlockHeader(null);
+        this.currentBlock = new BlockHeader();
     }
 
     public synchronized void addTransaction(Transaction transaction)

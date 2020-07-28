@@ -1,5 +1,7 @@
 package kr.ndy.core;
 
+import kr.ndy.core.blockchain.BlockChain;
+import kr.ndy.core.blockchain.BlockFileIO;
 import kr.ndy.core.blockchain.generator.BlockGenerator;
 import kr.ndy.core.blockchain.generator.BlockGeneratorTask;
 import kr.ndy.core.blockchain.generator.BlockMiningPool;
@@ -15,6 +17,8 @@ public class ZeppyModule {
     private BlockGeneratorTask generatorTask;
     private BlockMiningPool miningPool;
     private BlockObserverManager blockObserverManager;
+    private BlockChain blockChain;
+    private BlockFileIO blockIO;
 
     private ZeppyModule()
     {}
@@ -37,6 +41,7 @@ public class ZeppyModule {
         this.generatorTask = new BlockGeneratorTask(generator);
         this.miningPool = new BlockMiningPool();
         this.blockObserverManager = new BlockObserverManager();
+        this.blockIO = new BlockFileIO();
     }
 
     public void executeModuleTasks()

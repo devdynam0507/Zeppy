@@ -1,5 +1,6 @@
 package kr.ndy.util;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -47,4 +48,20 @@ public class ByteUtil {
         return destBuffer.array();
     }
 
+    public static String toHex(byte[] b)
+    {
+        return String.format("%064x", new BigInteger(1, b));
+    }
+
+    public static byte[] createZeroByte(final int size)
+    {
+        byte[] bytes = new byte[size];
+
+        for(int i = 0; i < size; i++)
+        {
+            bytes[i] = 0x00000000;
+        }
+
+        return bytes;
+    }
 }

@@ -13,7 +13,7 @@ public class BlockHeader {
 
     private int version;
     private int difficulty;
-    private byte[] previousHash;
+    private byte[] previousHash, blockHash;
     private MerkleTree merkleTree;
     private String timeStamp; //블럭 생성시 timestamp 생성
     private long nonce;
@@ -21,11 +21,10 @@ public class BlockHeader {
     private BlockBody body;
     private BlockPOW pow;
 
-    public BlockHeader(byte[] previousHash)
+    public BlockHeader()
     {
         this.version = BlockSchema.BLOCK_VERSION;
         this.difficulty = BlockSchema.BLOCK_DIFFICULTY;
-        this.previousHash = previousHash;
         this.merkleTree = new MerkleTree();
         this.timeStamp = DateUtil.generateFormat(new Date());
         this.nonce = 0x00;
@@ -36,6 +35,7 @@ public class BlockHeader {
 
     public BlockBody getBody() { return body; }
     public byte[] getPreviousHash() { return previousHash; }
+    public byte[] getBlockHash() { return blockHash; }
     public int getDifficulty() { return difficulty; }
     public long getNonce() { return nonce; }
     public int getVersion() { return version; }
@@ -78,6 +78,16 @@ public class BlockHeader {
         {
             previousHash[i] = 0x00;
         }
+    }
+
+    public void setPreviousHash(byte[] previousHash)
+    {
+        this.previousHash = previousHash;
+    }
+
+    public void setBlockHash(byte[] blockHash)
+    {
+        this.blockHash = blockHash;
     }
 
     public byte[] updateNonce()

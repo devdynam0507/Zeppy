@@ -21,6 +21,11 @@ public class BlockPOW {
         this.pow = pow;
     }
 
+    public byte[] getPowBytes()
+    {
+        return pow;
+    }
+
     public synchronized boolean validation()
     {
         byte[] hash = header.updateNonce();
