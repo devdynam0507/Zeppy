@@ -30,14 +30,10 @@ public class BlockMinerClient extends Thread {
                 if(bValid)
                 {
                     //TODO: pow 검증 시 수수료 지급 Transaction, 블럭 체인에 추가
+                    module.getBlockChain().combine(header);
                     header = null;
-                    System.exit(0);
+                    System.out.println("Valid");
                 }
-
-                System.out.println("id: {uid} ==> validation result is {valid}"
-                        .replace("{uid}", id + "")
-                        .replace("{valid}", bValid + "")
-                );
             } else
             {
                 header = pool.getCurrentPOWHeader();

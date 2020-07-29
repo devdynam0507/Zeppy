@@ -21,15 +21,16 @@ public class ZeppyModule {
     private BlockFileIO blockIO;
 
     private ZeppyModule()
-    {}
+    {
+        initialize();
+        registerObservers();
+    }
 
     public synchronized static ZeppyModule getInstance()
     {
         if(instance == null)
         {
             instance = new ZeppyModule();
-            instance.initialize();
-            instance.registerObservers();
         }
 
         return instance;
@@ -42,6 +43,9 @@ public class ZeppyModule {
         this.miningPool = new BlockMiningPool();
         this.blockObserverManager = new BlockObserverManager();
         this.blockIO = new BlockFileIO();
+        this.blockChain = new BlockChain(blockIO);
+
+        blockChain.loadAllBlocks();
     }
 
     public void executeModuleTasks()
@@ -57,6 +61,7 @@ public class ZeppyModule {
 
     public BlockGenerator getBlockGenerator() { return generator; }
     public BlockObserverManager getBlockObserverManager() { return blockObserverManager; }
+    public BlockChain getBlockChain() { return blockChain; }
 
     ////////////////////////////////////////////// Threads //////////////////////////////////////////////
     public BlockMiningPool getMiningPool() { return miningPool; }

@@ -45,13 +45,41 @@ public class BlockFileIO {
         {
             blocks.add(read(file));
         }
-        
+
+        logger.info("Loads " + blocks.size() + " blocks from disk and loads them");
+
         return blocks;
     }
 
     public BlockHeader read(File file)
     {
-        return null;
+        FileInputStream fis;
+        BufferedInputStream bis;
+        BlockHeader header = null;
+
+        try
+        {
+           fis = new FileInputStream(file);
+           bis = new BufferedInputStream(fis);
+           StringBuilder builder = new StringBuilder();
+           int buf;
+
+           while((buf = bis.read()) != -1)
+           {
+                builder.append((char) buf);
+           }
+
+           header = BlockInfo.fromJson(builder.toString());
+           logger.info("Successfully parsed block json");
+        } catch (FileNotFoundException e)
+        {
+            logger.warn("Not founded file!", e);
+        } catch (IOException e)
+        {
+            logger.warn("IOException", e);
+        }
+
+        return header;
     }
 
     public void write(BlockHeader header)
@@ -70,6 +98,8 @@ public class BlockFileIO {
             bos.write(json.getBytes());
             bos.close();
             fos.close();
+
+            logger.info("successfully write file " + fileName);
         }catch (FileNotFoundException e)
         {
             logger.warn("FileNotFoundException! - " + fileName, e.getCause());

@@ -1,10 +1,12 @@
 package kr.ndy.core.blockchain;
 
 import kr.ndy.core.merkletree.MerkleTree;
+import kr.ndy.core.transaction.Transaction;
 import kr.ndy.core.transaction.TransactionBuilder;
 import kr.ndy.core.wallet.Wallet;
 import kr.ndy.core.wallet.WalletAddress;
 import kr.ndy.core.wallet.WalletGenerator;
+import kr.ndy.util.ByteUtil;
 import kr.ndy.util.DateUtil;
 
 import java.util.Date;
@@ -20,6 +22,7 @@ public class BlockHeader {
 
     private BlockBody body;
     private BlockPOW pow;
+    private BlockInfo blockInfo;
 
     public BlockHeader()
     {
@@ -31,10 +34,11 @@ public class BlockHeader {
 
         this.body = new BlockBody();
         this.pow = new BlockPOW(this);
+        this.blockInfo = new BlockInfo(this);
     }
 
     public BlockBody getBody() { return body; }
-    public byte[] getPreviousHash() { return previousHash; }
+    public byte[] getPreviousHash() { return previousHash != null ? previousHash : ByteUtil.createZeroByte(32); }
     public byte[] getBlockHash() { return blockHash; }
     public int getDifficulty() { return difficulty; }
     public long getNonce() { return nonce; }
@@ -42,8 +46,7 @@ public class BlockHeader {
     public MerkleTree getMerkleTree() { return merkleTree; }
     public String getTimeStamp() { return timeStamp; }
     public synchronized BlockPOW getPow() { return pow; }
-
-    public BlockInfo getBlockInfo() { return new BlockInfo(this); }
+    public BlockInfo getBlockInfo() { return blockInfo; }
 
     public long getTime()
     {
@@ -67,9 +70,12 @@ public class BlockHeader {
 
         for(int i = 0; i < 999; i++)
         {
-            merkleTree.add(TransactionBuilder.builder().amount(0.5).receiver(address1.getWalletAddress()).sender(address2.getWalletAddress())
-                                    .senderPrivateKey(address1.toHexString(address1.getPrivateKey().getEncoded()))
-                .senderPublicKey(address1.toHexString(address1.getPublicKey().getEncoded())).build());
+            Transaction t = TransactionBuilder.builder().amount(0.5).receiver(address1.getWalletAddress()).sender(address2.getWalletAddress())
+                    .senderPrivateKey(address1.toHexString(address1.getPrivateKey().getEncoded()))
+                    .senderPublicKey(address1.toHexString(address1.getPublicKey().getEncoded())).build();
+
+            merkleTree.add(t);
+            getBody().getTransactions().add(t);
         }
 
         previousHash = new byte[32];
@@ -80,20 +86,15 @@ public class BlockHeader {
         }
     }
 
-    public void setPreviousHash(byte[] previousHash)
-    {
-        this.previousHash = previousHash;
-    }
-
-    public void setBlockHash(byte[] blockHash)
-    {
-        this.blockHash = blockHash;
-    }
+    public void setPreviousHash(byte[] previousHash) { this.previousHash = previousHash; }
+    public void setBlockHash(byte[] blockHash) { this.blockHash = blockHash; }
+    public void setTimeStamp(String timeStamp) { this.timeStamp = timeStamp; }
+    public void updateNonce(long nonce) { this.nonce = nonce; }
 
     public byte[] updateNonce()
     {
         ++nonce;
-        System.out.println("nonce: " + nonce);
-        return getBlockInfo().hash();
+
+        return blockInfo.hash();
     }
 }

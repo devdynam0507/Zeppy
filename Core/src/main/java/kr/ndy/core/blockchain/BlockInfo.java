@@ -1,13 +1,18 @@
 package kr.ndy.core.blockchain;
 
 import kr.ndy.core.transaction.Transaction;
+import kr.ndy.core.transaction.TransactionInfo;
 import kr.ndy.crypto.SHA256;
 import kr.ndy.util.ByteUtil;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BlockInfo {
 
@@ -16,6 +21,46 @@ public class BlockInfo {
     public BlockInfo(BlockHeader block)
     {
         this.block = block;
+    }
+
+    public static BlockHeader fromJson(String json)
+    {
+        byte[] previousHash, blockHash;
+        long nonce;
+        String time;
+        List<Transaction> transactions;
+        BlockBuilder builder = BlockBuilder.builder();
+
+        try
+        {
+            JSONObject object = (JSONObject) new JSONParser().parse(json);
+            JSONObject transactionJsonObject = (JSONObject) object.get("transactions");
+            int transactionSize = transactionJsonObject.size();
+
+            blockHash = new BigInteger((String) object.get("block_hash"), 16).toByteArray();
+            previousHash = new BigInteger((String) object.get("prev_hash"), 16).toByteArray();
+            nonce = (long) object.get("nonce");
+            time = (String) object.get("time");
+            transactions = new ArrayList<>();
+
+            for(int i = 0; i < transactionSize; i++)
+            {
+                String transactionJson = (String) transactionJsonObject.get(i + "");
+                transactions.add(TransactionInfo.fromJsonWithTx(transactionJson));
+            }
+
+            builder.hash(blockHash)
+                    .previous(previousHash)
+                    .nonce(nonce)
+                    .time(time)
+                    .transactions(transactions);
+        } catch (ParseException e)
+        {
+            //TODO: handle  builder  exception
+            e.printStackTrace();
+        }
+
+        return builder.build();
     }
 
     public byte[] hash()
@@ -33,23 +78,6 @@ public class BlockInfo {
         return ByteUtil.toLittleEndian(arr);
     }
 
-    private byte[] digest(byte[] arr)
-    {
-        MessageDigest digest = null;
-
-        try
-        {
-            digest = MessageDigest.getInstance("SHA-256");
-
-            digest.update(arr);
-        } catch (NoSuchAlgorithmException e)
-        {
-            e.printStackTrace();
-        }
-
-        return digest.digest();
-    }
-
     public String toJson()
     {
         JSONObject object = new JSONObject();
@@ -57,11 +85,12 @@ public class BlockInfo {
         BlockBody body = block.getBody();
 
         object.put("merkle_root", ByteUtil.toHex(block.getMerkleTree().toMerkleTree()[0]));
+        object.put("block_hash", ByteUtil.toHex(block.getBlockHash()));
         object.put("prev_hash", ByteUtil.toHex(block.getPreviousHash()));
         object.put("version", block.getVersion());
         object.put("nonce", block.getNonce());
         object.put("diff", block.getDifficulty());
-        object.put("time", block.getTime());
+        object.put("time", block.getTimeStamp());
         object.put("fee", body.getFee());
 
         int i = 0;
