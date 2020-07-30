@@ -32,7 +32,6 @@ public class BlockMinerClient extends Thread {
                     //TODO: pow 검증 시 수수료 지급 Transaction, 블럭 체인에 추가
                     module.getBlockChain().combine(header);
                     header = null;
-                    System.out.println("Valid");
                 }
             } else
             {

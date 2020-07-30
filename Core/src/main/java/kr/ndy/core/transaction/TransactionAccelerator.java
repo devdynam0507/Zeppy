@@ -3,6 +3,8 @@ package kr.ndy.core.transaction;
 import kr.ndy.core.transaction.exception.TransactionSignFailedException;
 import kr.ndy.crypto.Base64Crypto;
 import kr.ndy.crypto.DigitalSignatureSign;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -10,6 +12,7 @@ import java.security.PublicKey;
 public class TransactionAccelerator {
 
     private Transaction transaction;
+    private static Logger logger = LoggerFactory.getLogger(TransactionAccelerator.class);
 
     private TransactionAccelerator(Transaction transaction)
     {

@@ -27,12 +27,27 @@ public class Transaction {
                        double amount,
                        String createdAt)
     {
-        this.sender = sender;
-        this.receiver = receiver;
-        this.senderPrivateKey = new PrivateKeyDecoder(senderPrivateKey).decode();
-        this.senderPublicKey = new PublicKeyDecoder(senderPublicKey).decode();
-        this.amount = amount;
-        this.txDate = createdAt;
+        try
+        {
+            this.sender = sender;
+            this.receiver = receiver;
+            this.senderPublicKey = new PublicKeyDecoder(senderPublicKey).decode();
+            this.amount = amount;
+            this.txDate = createdAt;
+            this.senderPrivateKey = new PrivateKeyDecoder(senderPrivateKey).decode();
+        } catch (NullPointerException e)
+        {
+
+        }
+    }
+
+    public Transaction(String sender,
+                       String receiver,
+                       String senderPublicKey,
+                       double amount,
+                       String createdAt)
+    {
+        this(sender, receiver, null, senderPublicKey, amount, createdAt);
     }
 
     public String getSender() { return sender; }

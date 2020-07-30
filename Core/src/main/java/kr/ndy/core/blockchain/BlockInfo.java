@@ -1,6 +1,7 @@
 package kr.ndy.core.blockchain;
 
 import kr.ndy.core.transaction.Transaction;
+import kr.ndy.core.transaction.TransactionAccelerator;
 import kr.ndy.core.transaction.TransactionInfo;
 import kr.ndy.crypto.SHA256;
 import kr.ndy.util.ByteUtil;
@@ -46,7 +47,7 @@ public class BlockInfo {
             for(int i = 0; i < transactionSize; i++)
             {
                 String transactionJson = (String) transactionJsonObject.get(i + "");
-                transactions.add(TransactionInfo.fromJsonWithTx(transactionJson));
+                transactions.add(TransactionInfo.fromJsonWithAcc(transactionJson));
             }
 
             builder.hash(blockHash)
@@ -96,7 +97,8 @@ public class BlockInfo {
         int i = 0;
         for(Transaction tx : body.getTransactions())
         {
-            transactions.put(i + "", tx.getTxInfo().toJson());
+            TransactionAccelerator accelerator = TransactionAccelerator.accelerator(tx);
+            transactions.put(i + "", accelerator.sign(tx.getSenderPrivateKey(), tx.getSenderPublicKey()));
             ++i;
         }
 

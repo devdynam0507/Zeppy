@@ -20,9 +20,11 @@ public class BlockChain {
         this.bfio = bfio;
     }
 
-    public void combine(BlockHeader header)
+    public synchronized void combine(BlockHeader header)
     {
         int size = size();
+
+        header.setBlockHash(header.getPow().getPowBytes());
 
         if(size > 0)
         {
@@ -37,15 +39,27 @@ public class BlockChain {
             logger.info("Created genesis block");
         }
 
-        header.setBlockHash(header.getPow().getPowBytes());
         chains.add(header);
         bfio.write(header);
-        System.exit(0);
+    }
+
+    private void recombine()
+    {
+        int chainSize = size();
+        List<BlockHeader> recombinedChains = new ArrayList<>();
+        recombinedChains.add(getGenesisBlockFromPrivsByte());
+
+        for(int i = 0; i < chainSize; i++)
+        {
+
+        }
     }
 
     public void loadAllBlocks()
     {
         this.chains = bfio.read();
+        recombine();
+
         logger.info("Successfully " + chains.size() + " loaded blocks");
     }
 
@@ -54,6 +68,13 @@ public class BlockChain {
     public BlockHeader getGenesisBlock()
     {
         return chains.size() <= 0 ? null : chains.get(0);
+    }
+
+    public BlockHeader getGenesisBlockFromPrivsByte()
+    {
+        byte[] zero32 = ByteUtil.createZeroByte(32);
+
+        return chains.stream().filter(i -> i.getPreviousHash().equals(zero32)).findFirst().orElse(null);
     }
 
     public int size()

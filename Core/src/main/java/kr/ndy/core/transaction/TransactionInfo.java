@@ -1,5 +1,6 @@
 package kr.ndy.core.transaction;
 
+import kr.ndy.crypto.Base64Crypto;
 import kr.ndy.crypto.SHA256;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -7,6 +8,7 @@ import org.json.simple.parser.ParseException;
 
 import java.math.BigInteger;
 import java.security.PublicKey;
+import java.util.Base64;
 
 public class TransactionInfo {
 
@@ -42,10 +44,12 @@ public class TransactionInfo {
             String signedStr = (String) jsonObject.get("signed");
 
             JSONObject accIn = fromJsonWithAccIn(acc);
-            String txJsonWithBase64 = (String) accIn.get("tx");
+            //Decrypt  double  base64
+            String txJsonWithBase64 = new String(new Base64Crypto(((String) accIn.get("tx")).getBytes()).decode());
+            txJsonWithBase64 = new String(new Base64Crypto(txJsonWithBase64.getBytes()).decode());
             String publicKey = (String) accIn.get("pub");
 
-            acceleratorObject = new TransactionAcceleratorObject(acc, signedStr, publicKey, txJsonWithBase64);
+            acceleratorObject = new TransactionAcceleratorObject(acc, signedStr, publicKey, (JSONObject) new JSONParser().parse(txJsonWithBase64));
         } catch (ParseException e)
         {
             e.printStackTrace();
