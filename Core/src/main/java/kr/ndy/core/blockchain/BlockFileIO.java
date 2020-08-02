@@ -5,8 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -36,14 +35,19 @@ public class BlockFileIO {
         return file;
     }
 
-    public List<BlockHeader> read()
+    public Vector<BlockHeader> read()
     {
-        List<BlockHeader> blocks = new ArrayList<>();
+        Vector<BlockHeader> blocks = new Vector<>();
         File[] files = mkdir().listFiles((dir, name) -> name.endsWith(BLOCK_FILE_EXTENSION));
 
         for(File file : files)
         {
-            blocks.add(read(file));
+            BlockHeader header = read(file);
+
+            if(header != null)
+            {
+                blocks.add(header);
+            }
         }
 
         logger.info("Loads " + blocks.size() + " blocks from disk and loads them");

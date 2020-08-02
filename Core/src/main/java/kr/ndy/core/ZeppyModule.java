@@ -38,10 +38,10 @@ public class ZeppyModule {
 
     private void initialize()
     {
-        this.generator = new BlockGenerator();
-        this.generatorTask = new BlockGeneratorTask(generator);
-        this.miningPool = new BlockMiningPool();
         this.blockObserverManager = new BlockObserverManager();
+        this.generator = new BlockGenerator();
+        this.miningPool = new BlockMiningPool();
+        this.generatorTask = new BlockGeneratorTask(generator, miningPool);
         this.blockIO = new BlockFileIO();
         this.blockChain = new BlockChain(blockIO);
 
@@ -51,7 +51,6 @@ public class ZeppyModule {
     public void executeModuleTasks()
     {
         ZeppyThreadPoolManager.getInstance().service(generatorTask, 0, 1, TimeUnit.SECONDS);
-        ZeppyThreadPoolManager.getInstance().service(miningPool, 0, 1, TimeUnit.SECONDS);
     }
 
     public void registerObservers()

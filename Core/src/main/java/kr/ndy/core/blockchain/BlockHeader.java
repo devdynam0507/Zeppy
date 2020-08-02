@@ -70,7 +70,7 @@ public class BlockHeader {
 
         for(int i = 0; i < 999; i++)
         {
-            Transaction t = TransactionBuilder.builder().amount(0.5).receiver(address1.getWalletAddress()).sender(address2.getWalletAddress())
+            Transaction t = TransactionBuilder.builder().amount(Math.random()).receiver(address1.getWalletAddress()).sender(address2.getWalletAddress())
                     .senderPrivateKey(address1.toHexString(address1.getPrivateKey().getEncoded()))
                     .senderPublicKey(address1.toHexString(address1.getPublicKey().getEncoded())).build();
 
@@ -90,6 +90,11 @@ public class BlockHeader {
     public void setBlockHash(byte[] blockHash) { this.blockHash = blockHash; }
     public void setTimeStamp(String timeStamp) { this.timeStamp = timeStamp; }
     public void updateNonce(long nonce) { this.nonce = nonce; }
+
+    public boolean isGenesis()
+    {
+        return previousHash.length == 1 && previousHash[0] == 0x00000000;
+    }
 
     public byte[] updateNonce()
     {

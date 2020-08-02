@@ -17,6 +17,7 @@ public class BlockGenerator {
     {
         currentBlock.getMerkleTree().add(transaction);
     }
+    public synchronized void setNull() { this.currentBlock = null; }
 
     public BlockHeader getCurrentBlock() { return currentBlock; }
     public BlockHeader getPreviousBlock() { return previousBlock; }

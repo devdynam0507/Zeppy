@@ -31,6 +31,12 @@
             <artifactId>Bitcoin</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>${netty.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>

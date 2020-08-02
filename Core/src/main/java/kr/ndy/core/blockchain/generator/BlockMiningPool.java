@@ -1,30 +1,22 @@
 package kr.ndy.core.blockchain.generator;
 
-import kr.ndy.core.ZeppyModule;
 import kr.ndy.core.blockchain.BlockHeader;
 import kr.ndy.core.blockchain.observer.IBlockObserver;
 
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Queue;
 
-public class BlockMiningPool extends Thread implements IBlockObserver {
+public class BlockMiningPool implements IBlockObserver {
 
     private Queue<BlockHeader> waitingHeaders;
     private BlockHeader currentPOWHeader; //작업증명중인 블럭
+    private byte[] previousHash;
+    private Thread testThread;
 
     public BlockMiningPool()
     {
         waitingHeaders = new LinkedList<>();
-    }
-
-    @Override
-    public void run()
-    {
-        if(currentPOWHeader == null && waitingHeaders.size() > 0)
-        {
-            currentPOWHeader = waitingHeaders.remove();
-            ZeppyModule.getInstance().getBlockObserverManager().call(currentPOWHeader);
-        }
     }
 
     public synchronized BlockHeader getCurrentPOWHeader()
@@ -32,20 +24,48 @@ public class BlockMiningPool extends Thread implements IBlockObserver {
         return currentPOWHeader;
     }
 
+    public synchronized void complete(byte[] hash)
+    {
+        if(currentPOWHeader != null)
+        {
+            currentPOWHeader = null;
+            previousHash = hash;
+        }
+    }
+
     public synchronized void addPool(BlockHeader header)
     {
         waitingHeaders.add(header);
     }
 
+    private void createTestThread()
+    {
+        if(testThread == null)
+        {
+            testThread = new BlockMinerClient(0);
+            testThread.start();
+        }
+    }
+
     @Override
     public void onGenerateBlock(BlockHeader header)
     {
-        //TODO: 테스트용 코드 삭제, 클라이언트 마이너 풀한테 broadcast
-        Thread cl1 = new BlockMinerClient(0);
-        Thread cl2 = new BlockMinerClient(1);
+        if(currentPOWHeader != null)
+        {
+            addPool(header);
+        } else
+        {
+            if(waitingHeaders.size() > 0)
+            {
+                currentPOWHeader = waitingHeaders.remove();
+            }else
+            {
+                currentPOWHeader = header;
+            }
+        }
 
-        cl1.start();
-        cl2.start();
+        createTestThread();
+        //TODO: 테스트용 코드 삭제, 클라이언트 마이너한테 broadcast
     }
 
     @Override

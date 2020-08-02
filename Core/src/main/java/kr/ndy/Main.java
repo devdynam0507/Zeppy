@@ -10,8 +10,9 @@ public class Main {
     public static void main(String... args)
     {
         Security.addProvider(new BouncyCastleProvider());
-        ZeppyModule.getInstance().executeModuleTasks();
+//        ZeppyModule.getInstance().executeModuleTasks();
 
+        ZeppyModule.getInstance().getBlockChain().print();
 
 //        Wallet wallet1 = WalletGenerator.create();
 //        WalletAddress address1 = wallet1.getAddress();

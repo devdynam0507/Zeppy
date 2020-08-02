@@ -37,7 +37,6 @@ public class Transaction {
             this.senderPrivateKey = new PrivateKeyDecoder(senderPrivateKey).decode();
         } catch (NullPointerException e)
         {
-
         }
     }
 
