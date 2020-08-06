@@ -1,4 +1,10 @@
 package kr.ndy.handler;
 
-public class Ping {
+import kr.ndy.codec.IJsonSerializable;
+
+public class Ping implements IJsonSerializable {
+
+    @Override
+    public String toJson() { return null; }
+
 }

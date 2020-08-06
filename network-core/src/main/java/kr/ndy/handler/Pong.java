@@ -1,4 +1,10 @@
 package kr.ndy.handler;
 
-public class Pong {
+import kr.ndy.codec.IJsonSerializable;
+
+public class Pong implements IJsonSerializable {
+    @Override
+    public String toJson() {
+        return null;
+    }
 }
