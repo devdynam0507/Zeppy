@@ -7,16 +7,17 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import kr.ndy.codec.Message;
+import kr.ndy.codec.MessageType;
 import kr.ndy.codec.handler.IMessageHandler;
 import kr.ndy.codec.handler.MessageHandlerFactory;
-import kr.ndy.protocol.ICommProtocol;
+import kr.ndy.protocol.ICommProtocolConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class Server extends SimpleChannelInboundHandler<Message> implements ICommProtocol {
+public class Server extends SimpleChannelInboundHandler<Message> implements ICommProtocolConnection {
 
     private Logger logger;
     private EventLoopGroup parent, child;
@@ -36,9 +37,16 @@ public class Server extends SimpleChannelInboundHandler<Message> implements ICom
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message message) throws Exception
     {
-        byte messageType = message.getType();
-        IMessageHandler handler = MessageHandlerFactory.getMessageHandlerFactory(messageType);
-        handler.handle(ctx, message);
+        IMessageHandler handler = null;
+
+        switch (message.getType())
+        {
+            case MessageType.PING:
+                handler = MessageHandlerFactory.getMessageHandlerFactory(MessageType.OK);
+                break;
+        }
+
+        handler.handle(ctx, message, this);
     }
 
     @Override
@@ -51,7 +59,6 @@ public class Server extends SimpleChannelInboundHandler<Message> implements ICom
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 100)
                     .handler(new LoggingHandler(Server.class, LogLevel.INFO))
-                    //TODO: fix  to  handler  param
                     .childHandler(new ServerInitializer(this));
 
             ChannelFuture future = bootstrap.bind(port).sync();
@@ -75,4 +82,10 @@ public class Server extends SimpleChannelInboundHandler<Message> implements ICom
         }
     }
 
+    @Override
+    public void establish(Channel channel)
+    {
+        channels.add(channel);
+        logger.info("Establish connection client: {id}".replace("{id}", channel.id().asLongText()));
+    }
 }

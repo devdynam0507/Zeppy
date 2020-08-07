@@ -13,9 +13,6 @@ public class MessageHandlerFactory {
             case MessageType.PING:
                 handler = new Ping();
                 break;
-            case MessageType.PONG:
-                handler = new Pong();
-                break;
             case MessageType.OK:
                 handler = new PingPongOK();
                 break;
