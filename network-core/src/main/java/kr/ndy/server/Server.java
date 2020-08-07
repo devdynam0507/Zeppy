@@ -1,20 +1,27 @@
 package kr.ndy.server;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import kr.ndy.codec.Message;
+import kr.ndy.codec.handler.IMessageHandler;
+import kr.ndy.codec.handler.MessageHandlerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Server {
+import java.util.HashSet;
+import java.util.Set;
+
+public class Server extends SimpleChannelInboundHandler<Message> {
 
     private Logger logger;
     private EventLoopGroup parent, child;
     private int port;
+
+    private Set<Channel> channels;
 
     public Server(int port)
     {
@@ -22,6 +29,15 @@ public class Server {
         this.parent = new NioEventLoopGroup(ServerSchema.SERVER_SOCK_THREAD);
         this.child = new NioEventLoopGroup(ServerSchema.CHANNEL_SOCK_THREAD);
         this.port = port;
+        this.channels = new HashSet<>();
+    }
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, Message message) throws Exception
+    {
+        byte messageType = message.getType();
+        IMessageHandler handler = MessageHandlerFactory.getMessageHandlerFactory(messageType);
+        handler.handle(ctx, message);
     }
 
     public void enable()
@@ -34,7 +50,7 @@ public class Server {
                     .option(ChannelOption.SO_BACKLOG, 100)
                     .handler(new LoggingHandler(Server.class, LogLevel.INFO))
                     //TODO: fix  to  handler  param
-                    .childHandler(new ServerInitializer(null));
+                    .childHandler(new ServerInitializer(this));
 
             bootstrap.bind(port).sync();
         } catch (InterruptedException e)

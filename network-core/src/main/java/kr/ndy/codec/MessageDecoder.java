@@ -11,7 +11,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception
     {
-        
+        list.add(Message.fromPacket(byteBuf));
     }
 
 }
