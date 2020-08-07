@@ -16,6 +16,9 @@ public class MessageHandlerFactory {
             case MessageType.PONG:
                 handler = new Pong();
                 break;
+            case MessageType.OK:
+                handler = new PingPongOK();
+                break;
             case MessageType.REQUEST_DNS_FULL_NODE:
             case MessageType.REQUEST_FULL_CHAIN:
                 break;

@@ -9,13 +9,14 @@ import io.netty.handler.logging.LoggingHandler;
 import kr.ndy.codec.Message;
 import kr.ndy.codec.handler.IMessageHandler;
 import kr.ndy.codec.handler.MessageHandlerFactory;
+import kr.ndy.protocol.ICommProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class Server extends SimpleChannelInboundHandler<Message> {
+public class Server extends SimpleChannelInboundHandler<Message> implements ICommProtocol {
 
     private Logger logger;
     private EventLoopGroup parent, child;
@@ -40,6 +41,7 @@ public class Server extends SimpleChannelInboundHandler<Message> {
         handler.handle(ctx, message);
     }
 
+    @Override
     public void enable()
     {
         try
@@ -52,13 +54,15 @@ public class Server extends SimpleChannelInboundHandler<Message> {
                     //TODO: fix  to  handler  param
                     .childHandler(new ServerInitializer(this));
 
-            bootstrap.bind(port).sync();
+            ChannelFuture future = bootstrap.bind(port).sync();
+            logger.info("Initialized server bootstrap.. server enabled");
         } catch (InterruptedException e)
         {
             e.printStackTrace();
         }
     }
 
+    @Override
     public void disable()
     {
         try

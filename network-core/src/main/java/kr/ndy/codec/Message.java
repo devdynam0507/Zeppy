@@ -2,22 +2,32 @@ package kr.ndy.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class Message {
 
     private byte type;
-    private String json;
+    private JSONObject jsonObject;
 
     protected Message(byte type, String json)
     {
         this.type = type;
-        this.json = json;
+
+        try
+        {
+            this.jsonObject = (JSONObject) new JSONParser().parse(json);
+        } catch (ParseException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public ByteBuf toPacket()
     {
         ByteBuf buf = PooledByteBufAllocator.DEFAULT.buffer();
-        byte[] jsonBytes = json.getBytes();
+        byte[] jsonBytes = jsonObject.toJSONString().getBytes();
 
         buf.writeByte(jsonBytes.length);
 
@@ -40,7 +50,8 @@ public class Message {
                 .create();
     }
 
-    public String getJson() { return json; }
+    public JSONObject getJson() { return jsonObject; }
+
     public byte getType() { return type; }
 
 }
