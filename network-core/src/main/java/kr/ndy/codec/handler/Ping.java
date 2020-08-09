@@ -7,6 +7,7 @@ import kr.ndy.codec.MessageBuilder;
 import kr.ndy.codec.MessageType;
 import kr.ndy.protocol.ICommProtocolConnection;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
 
 public class Ping extends ReadWriteable implements IJsonSerializable, IMessageHandler {
 
@@ -20,7 +21,7 @@ public class Ping extends ReadWriteable implements IJsonSerializable, IMessageHa
     }
 
     @Override
-    public void handle(ChannelHandlerContext ctx, Message message, ICommProtocolConnection connection)
+    public void handle(ChannelHandlerContext ctx, Message message, ICommProtocolConnection connection, Logger logger)
     {
         message = MessageBuilder.builder()
                 .json(this::toJson)
@@ -28,6 +29,7 @@ public class Ping extends ReadWriteable implements IJsonSerializable, IMessageHa
                 .create();
 
         ctx.writeAndFlush(message);
+        logger.info("send ping message 'request'");
     }
 
 }

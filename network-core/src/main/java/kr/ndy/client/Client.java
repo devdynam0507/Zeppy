@@ -9,6 +9,7 @@ import kr.ndy.codec.MessageType;
 import kr.ndy.codec.handler.IMessageHandler;
 import kr.ndy.codec.handler.MessageHandlerFactory;
 import kr.ndy.protocol.ICommProtocolConnection;
+import kr.ndy.server.ServerOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,7 @@ public class Client extends SimpleChannelInboundHandler<Message> implements ICom
     public void channelActive(ChannelHandlerContext ctx) throws Exception
     {
         IMessageHandler message = MessageHandlerFactory.getMessageHandlerFactory(MessageType.PING);
-        message.handle(ctx, null, null);
+        message.handle(ctx, null, null, logger);
     }
 
     @Override
@@ -67,11 +68,12 @@ public class Client extends SimpleChannelInboundHandler<Message> implements ICom
         Bootstrap bootstrap = new Bootstrap();
 
         bootstrap.channel(NioSocketChannel.class)
+                .group(group)
                 .handler(initializer);
 
         try
         {
-            ChannelFuture future = bootstrap.connect("localhost", port).sync();
+            bootstrap.connect("localhost", port).sync();
         } catch (InterruptedException e)
         {
             disable();

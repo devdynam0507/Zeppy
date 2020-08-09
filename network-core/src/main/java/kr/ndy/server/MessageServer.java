@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Server extends SimpleChannelInboundHandler<Message> implements ICommProtocolConnection {
+public class MessageServer extends SimpleChannelInboundHandler<Message> implements ICommProtocolConnection {
 
     private Logger logger;
     private EventLoopGroup parent, child;
@@ -25,11 +25,11 @@ public class Server extends SimpleChannelInboundHandler<Message> implements ICom
 
     private Set<Channel> channels;
 
-    public Server(int port)
+    public MessageServer(int port)
     {
-        this.logger = LoggerFactory.getLogger(Server.class);
-        this.parent = new NioEventLoopGroup(ServerSchema.SERVER_SOCK_THREAD);
-        this.child = new NioEventLoopGroup(ServerSchema.CHANNEL_SOCK_THREAD);
+        this.logger = LoggerFactory.getLogger(MessageServer.class);
+        this.parent = new NioEventLoopGroup(ServerOptions.SERVER_SOCK_THREAD);
+        this.child = new NioEventLoopGroup(ServerOptions.CHANNEL_SOCK_THREAD);
         this.port = port;
         this.channels = new HashSet<>();
     }
@@ -39,6 +39,7 @@ public class Server extends SimpleChannelInboundHandler<Message> implements ICom
     {
         IMessageHandler handler = null;
 
+        //TODO: Full chain download 요청 시 FileTransfer  server 로 리시브
         switch (message.getType())
         {
             case MessageType.PING:
@@ -46,7 +47,7 @@ public class Server extends SimpleChannelInboundHandler<Message> implements ICom
                 break;
         }
 
-        handler.handle(ctx, message, this);
+        handler.handle(ctx, message, this, logger);
     }
 
     @Override
@@ -58,8 +59,8 @@ public class Server extends SimpleChannelInboundHandler<Message> implements ICom
             bootstrap.group(parent, child)
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 100)
-                    .handler(new LoggingHandler(Server.class, LogLevel.INFO))
-                    .childHandler(new ServerInitializer(this));
+                    .handler(new LoggingHandler(MessageServer.class, LogLevel.INFO))
+                    .childHandler(new MessageServerInitializer(this));
 
             ChannelFuture future = bootstrap.bind(port).sync();
             logger.info("Initialized server bootstrap.. server enabled");

@@ -8,11 +8,11 @@ import kr.ndy.codec.Message;
 import kr.ndy.codec.MessageDecoder;
 import kr.ndy.codec.MessageEncoder;
 
-public class ServerInitializer extends ChannelInitializer<SocketChannel> {
+public class MessageServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private SimpleChannelInboundHandler<Message> handler;
 
-    public ServerInitializer(SimpleChannelInboundHandler<Message> handler) {
+    public MessageServerInitializer(SimpleChannelInboundHandler<Message> handler) {
         this.handler = handler;
     }
 

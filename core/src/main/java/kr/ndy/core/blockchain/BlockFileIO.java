@@ -35,10 +35,15 @@ public class BlockFileIO {
         return file;
     }
 
+    public File[] getFullBlockFiles()
+    {
+        return mkdir().listFiles((dir, name) -> name.endsWith(BLOCK_FILE_EXTENSION));
+    }
+
     public Vector<BlockHeader> read()
     {
         Vector<BlockHeader> blocks = new Vector<>();
-        File[] files = mkdir().listFiles((dir, name) -> name.endsWith(BLOCK_FILE_EXTENSION));
+        File[] files = getFullBlockFiles();
 
         for(File file : files)
         {
