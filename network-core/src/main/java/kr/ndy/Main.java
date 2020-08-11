@@ -10,10 +10,11 @@ public class Main {
 
     public static void main(String... args)
     {
-        ServerExecutor executor = new ServerExecutor(
+        ServerExecutor executor = new ServerExecutor
+        (
                 new MessageServer(ServerOptions.TEST_MESSAGE_SERVER_PORT),
                 new FileTransferSever(ServerOptions.TEST_FILE_TRANSFER_SERVER_PORT)
-            );
+        );
         executor.executeService();
 
         Client client = new Client(ServerOptions.TEST_MESSAGE_SERVER_PORT);

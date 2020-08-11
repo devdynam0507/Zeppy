@@ -33,6 +33,7 @@ public class FileTransferSever extends SimpleChannelInboundHandler<ByteBuf> impl
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) throws Exception
     {
+
     }
 
     @Override

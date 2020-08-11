@@ -9,7 +9,7 @@ import kr.ndy.codec.MessageType;
 import kr.ndy.codec.handler.IMessageHandler;
 import kr.ndy.codec.handler.MessageHandlerFactory;
 import kr.ndy.protocol.ICommProtocolConnection;
-import kr.ndy.server.ServerOptions;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
