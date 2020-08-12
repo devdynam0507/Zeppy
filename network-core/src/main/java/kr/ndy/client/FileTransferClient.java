@@ -18,6 +18,13 @@ public class FileTransferClient extends SimpleChannelInboundHandler<ByteBuf> imp
     private EventLoopGroup group;
     private Logger logger;
 
+    /**
+     * 1. 메세지 서버랑 연결시 파일 전송 서버랑 같이 연결
+     *
+     * 2. 지속적인 update 패킷을 주고받아 블록 생성 시 transfer  file
+     *
+     * */
+
     public FileTransferClient(int port)
     {
         this.port = port;
@@ -26,9 +33,15 @@ public class FileTransferClient extends SimpleChannelInboundHandler<ByteBuf> imp
     }
 
     @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception
+    {
+
+    }
+
+    @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) throws Exception
     {
-        
+
     }
 
     @Override

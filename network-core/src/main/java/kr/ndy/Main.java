@@ -1,6 +1,6 @@
 package kr.ndy;
 
-import kr.ndy.client.Client;
+import kr.ndy.client.MessageClient;
 import kr.ndy.server.FileTransferSever;
 import kr.ndy.server.MessageServer;
 import kr.ndy.server.ServerExecutor;
@@ -17,7 +17,7 @@ public class Main {
         );
         executor.executeService();
 
-        Client client = new Client(ServerOptions.TEST_MESSAGE_SERVER_PORT);
+        MessageClient client = new MessageClient(ServerOptions.TEST_MESSAGE_SERVER_PORT);
         client.enable();
     }
 

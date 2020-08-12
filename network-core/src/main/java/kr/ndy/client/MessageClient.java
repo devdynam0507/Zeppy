@@ -10,13 +10,14 @@ import kr.ndy.codec.handler.IMessageHandler;
 import kr.ndy.codec.handler.MessageHandlerFactory;
 import kr.ndy.protocol.ICommProtocolConnection;
 
+import kr.ndy.server.ServerOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class Client extends SimpleChannelInboundHandler<Message> implements ICommProtocolConnection {
+public class MessageClient extends SimpleChannelInboundHandler<Message> implements ICommProtocolConnection {
 
     //TODO: add dns seeds member variable
     private int port;
@@ -24,14 +25,17 @@ public class Client extends SimpleChannelInboundHandler<Message> implements ICom
     private ClientInitializer initializer;
     private Set<Channel> channels;
     private Logger logger;
+    private FileTransferClient _ftClient;
 
-    public Client(/* Todo: param  dns  seeds */int port)
+    public MessageClient(/* Todo: param  dns  seeds */int port)
     {
         this.port = port;
         this.group = new NioEventLoopGroup();
         this.initializer = new ClientInitializer(this);
         this.channels = new HashSet<>();
-        this.logger = LoggerFactory.getLogger(Client.class);
+        this.logger = LoggerFactory.getLogger(MessageClient.class);
+
+        connectFileTransferSever(); //ftp 서버랑 연결
     }
 
     /**
@@ -52,6 +56,25 @@ public class Client extends SimpleChannelInboundHandler<Message> implements ICom
             case MessageType.OK:
                 establish(ctx.channel());
                 break;
+
+        }
+    }
+
+    private void releaseFileTransferServer()
+    {
+        if(_ftClient != null)
+        {
+            _ftClient.disable();
+            _ftClient = null;
+        }
+    }
+
+    private void connectFileTransferSever()
+    {
+        if(_ftClient == null)
+        {
+            _ftClient = new FileTransferClient(ServerOptions.TEST_FILE_TRANSFER_SERVER_PORT);
+            _ftClient.enable();
         }
     }
 

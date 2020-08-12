@@ -62,8 +62,8 @@ public class MessageServer extends SimpleChannelInboundHandler<Message> implemen
                     .handler(new LoggingHandler(MessageServer.class, LogLevel.INFO))
                     .childHandler(new MessageServerInitializer(this));
 
-            ChannelFuture future = bootstrap.bind(port).sync();
-            logger.info("Initialized server bootstrap.. server enabled");
+            bootstrap.bind(port).sync();
+            logger.info("Initialized message server bootstrap.. server enabled");
         } catch (InterruptedException e)
         {
             e.printStackTrace();

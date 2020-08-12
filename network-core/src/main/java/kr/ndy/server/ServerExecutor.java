@@ -1,6 +1,5 @@
 package kr.ndy.server;
 
-import jdk.internal.jline.internal.Nullable;
 import kr.ndy.protocol.ICommProtocol;
 
 public class ServerExecutor {
@@ -12,7 +11,6 @@ public class ServerExecutor {
         this.protocols = protocol;
     }
 
-    @Nullable
     public ICommProtocol getProtocol(ICommProtocol comm)
     {
         ICommProtocol protocol = null;
