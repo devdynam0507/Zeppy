@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class BlockFileIO {
 
-    private static final String BLOCK_FILE_EXTENSION = ".zblk";
+    protected static final String BLOCK_FILE_EXTENSION = ".zblk";
 
     private Logger logger;
     private final ReadWriteLock lock;

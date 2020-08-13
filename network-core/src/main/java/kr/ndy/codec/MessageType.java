@@ -8,5 +8,7 @@ public class MessageType {
     public static final byte OK                         = 0x00000002;
     public static final byte RESPONSE_UPDATE_BLOCK      = 0x00000003;
     public static final byte RESPONSE_FULL_BLOCKS       = 0x00000004;
+    public static final byte REQUEST_UPDATE_BLOCK       = 0x00000005;
+    public static final byte REQUEST_FULL_BLOCKS        = 0x00000006;
 
 }

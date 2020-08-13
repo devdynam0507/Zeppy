@@ -8,13 +8,12 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import kr.ndy.codec.Message;
-import kr.ndy.codec.MessageBuilder;
+
 import kr.ndy.codec.MessageType;
 import kr.ndy.core.blockchain.BlockHeader;
 import kr.ndy.core.blockchain.observer.IBlockObserver;
 import kr.ndy.protocol.ICommProtocol;
-import org.json.simple.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +47,15 @@ public class FileTransferSever extends SimpleChannelInboundHandler<ByteBuf> impl
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) throws Exception
     {
+        if(buf.readableBytes() >= 4)
+        {
+            int messageType = buf.readByte();
 
+            if(messageType == MessageType.REQUEST_FULL_BLOCKS)
+            {
+                //response block files
+            }
+        }
     }
 
 
