@@ -31,6 +31,11 @@ public class BlockFileCache {
         binaryFiles.add(toByte(file));
     }
 
+    public List<byte[]> getBinaryFiles()
+    {
+        return binaryFiles;
+    }
+
     private void load(File directory)
     {
         File[] files = directory.listFiles((dir, name) -> name.endsWith(".zblk"));

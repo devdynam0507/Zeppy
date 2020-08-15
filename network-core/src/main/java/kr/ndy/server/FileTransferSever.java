@@ -10,21 +10,28 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
 import kr.ndy.codec.MessageType;
+import kr.ndy.core.ZeppyModule;
+import kr.ndy.core.blockchain.BlockFileCache;
 import kr.ndy.core.blockchain.BlockHeader;
 import kr.ndy.core.blockchain.observer.IBlockObserver;
 import kr.ndy.protocol.ICommProtocol;
 
+import kr.ndy.server.task.FileResponseThread;
+import kr.ndy.server.task.FileTransferEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class FileTransferSever extends SimpleChannelInboundHandler<ByteBuf> implements ICommProtocol, IBlockObserver {
+public class FileTransferSever extends SimpleChannelInboundHandler<ByteBuf> implements ICommProtocol,
+        IBlockObserver, FileTransferEvent {
 
     private Logger logger;
     private EventLoopGroup parent, child;
     private int port;
+    private BlockFileCache cache;
 
+    private Set<Thread> connections;
     private Map<ChannelId, Channel> channels;
 
     public FileTransferSever(int port)
@@ -34,6 +41,8 @@ public class FileTransferSever extends SimpleChannelInboundHandler<ByteBuf> impl
         this.port = port;
         this.logger = LoggerFactory.getLogger(FileTransferSever.class);
         this.channels = new HashMap<>();
+        this.connections = new HashSet<>();
+        this.cache = ZeppyModule.getInstance().getFileCache();
     }
 
     @Override
@@ -53,16 +62,27 @@ public class FileTransferSever extends SimpleChannelInboundHandler<ByteBuf> impl
 
             if(messageType == MessageType.REQUEST_FULL_BLOCKS)
             {
-                //response block files
+                if(connections.size() > ServerOptions.FILE_TP_SERVER_CONNECTION_LIMIT)
+                {
+                    connections.add(new FileResponseThread(ctx, cache, this::onTransferFinish));
+                } else
+                {
+                    ctx.writeAndFlush(ByteBufAllocator.DEFAULT.buffer().writeByte(MessageType.CONNECTION_FULL));
+                }
             }
         }
     }
-
 
     public void broadcast(ByteBuf buf)
     {
         Collection<Channel> clients = channels.values();
         clients.forEach(channel -> channel.writeAndFlush(buf));
+    }
+
+    @Override
+    public void onTransferFinish(Thread thread)
+    {
+        connections.remove(thread);
     }
 
     @Override

@@ -55,7 +55,15 @@ public class FileTransferClient extends SimpleChannelInboundHandler<ByteBuf> imp
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) throws Exception
     {
+        if(buf.readableBytes() >= 4)
+        {
+            int messageType = buf.readByte();
 
+            switch (messageType)
+            {
+                case MessageType.RESPONSE_FULL_BLOCKS:
+            }
+        }
     }
 
     public boolean createClientBlockFileDirectory()

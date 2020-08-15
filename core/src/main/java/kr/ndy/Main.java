@@ -1,6 +1,7 @@
 package kr.ndy;
 
 import kr.ndy.core.ZeppyModule;
+import kr.ndy.core.blockchain.BlockFileCache;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.security.Security;
@@ -10,7 +11,7 @@ public class Main {
     public static void main(String... args)
     {
         Security.addProvider(new BouncyCastleProvider());
-        ZeppyModule.getInstance().executeModuleTasks();
+        BlockFileCache cache = ZeppyModule.getInstance().getFileCache();
 
 //        Wallet wallet1 = WalletGenerator.create();
 //        WalletAddress address1 = wallet1.getAddress();
