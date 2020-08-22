@@ -106,6 +106,7 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
     @Override
     public void disable()
     {
+        releaseFileTransferServer();
         group.shutdownGracefully();
     }
 }

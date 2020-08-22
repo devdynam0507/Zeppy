@@ -16,7 +16,7 @@ import kr.ndy.core.blockchain.BlockHeader;
 import kr.ndy.core.blockchain.observer.IBlockObserver;
 import kr.ndy.protocol.ICommProtocol;
 
-import kr.ndy.server.task.FileResponseThread;
+import kr.ndy.server.task.FileResponseServerThread;
 import kr.ndy.server.task.FileTransferEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,17 +54,25 @@ public class FileTransferSever extends SimpleChannelInboundHandler<ByteBuf> impl
     }
 
     @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception
+    {
+
+    }
+
+    @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) throws Exception
     {
-        if(buf.readableBytes() >= 4)
+        if(buf.readableBytes() >= 1)
         {
             int messageType = buf.readByte();
+            logger.warn("received  packet transfer server id: " + messageType);
 
             if(messageType == MessageType.REQUEST_FULL_BLOCKS)
             {
-                if(connections.size() > ServerOptions.FILE_TP_SERVER_CONNECTION_LIMIT)
+                if(connections.size() < ServerOptions.FILE_TP_SERVER_CONNECTION_LIMIT)
                 {
-                    connections.add(new FileResponseThread(ctx, cache, this::onTransferFinish));
+                    new FileResponseServerThread(ctx, cache, this::onTransferFinish).start();
+                    logger.info("start response server thread");
                 } else
                 {
                     ctx.writeAndFlush(ByteBufAllocator.DEFAULT.buffer().writeByte(MessageType.CONNECTION_FULL));

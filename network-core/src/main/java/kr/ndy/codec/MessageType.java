@@ -11,5 +11,7 @@ public class MessageType {
     public static final byte REQUEST_UPDATE_BLOCK       = 0x00000005;
     public static final byte REQUEST_FULL_BLOCKS        = 0x00000006;
     public static final byte CONNECTION_FULL            = 0x00000007;
+    public static final byte EOF                        = 0x0000000A;
+    public static final byte TRANSFER_BIT_PACKET        = 0x00000009;
 
 }
