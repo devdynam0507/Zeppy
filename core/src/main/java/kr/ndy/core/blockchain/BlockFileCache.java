@@ -2,16 +2,18 @@ package kr.ndy.core.blockchain;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BlockFileCache {
 
-    private List<byte[]> binaryFiles;
+    private Map<String, byte[]> binaryFiles;
     private List<File> fileList;
 
     public BlockFileCache(File directory)
     {
-        this.binaryFiles = new ArrayList<>();
+        this.binaryFiles = new HashMap<>();
         this.fileList = new ArrayList<>();
 
         if(directory.isDirectory())
@@ -28,10 +30,10 @@ public class BlockFileCache {
     public void update(File file)
     {
         fileList.add(file);
-        binaryFiles.add(toByte(file));
+        binaryFiles.put(file.getName(), toByte(file));
     }
 
-    public List<byte[]> getBinaryFiles()
+    public Map<String, byte[]> getBinaryFiles()
     {
         return binaryFiles;
     }
@@ -69,13 +71,13 @@ public class BlockFileCache {
         return _buf;
     }
 
-    private List<byte[]> fileToBytesArrays()
+    private Map<String, byte[]> fileToBytesArrays()
     {
         if(binaryFiles.size() == 0)
         {
             for(File file : fileList)
             {
-                binaryFiles.add(toByte(file));
+                binaryFiles.put(file.getName(), toByte(file));
             }
         }
 

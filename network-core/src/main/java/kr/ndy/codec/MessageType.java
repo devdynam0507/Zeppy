@@ -13,5 +13,6 @@ public class MessageType {
     public static final byte CONNECTION_FULL            = 0x00000007;
     public static final byte EOF                        = 0x0000000A;
     public static final byte TRANSFER_BIT_PACKET        = 0x00000009;
+    public static final byte FILE_NAME_PACKET           = 0x0000000B;
 
 }

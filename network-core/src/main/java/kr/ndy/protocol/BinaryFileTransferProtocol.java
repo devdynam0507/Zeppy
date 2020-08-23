@@ -11,13 +11,15 @@ public class BinaryFileTransferProtocol {
     private static final int PROTOCOL_DATA_SIZE = 1021;
 
     private byte[] data;
+    private byte[] fileNameBytes;
     private int offset;
 
     private ByteBuf buf;
 
-    public BinaryFileTransferProtocol(byte[] data)
+    public BinaryFileTransferProtocol(String fileName, byte[] data)
     {
         this.data = data;
+        this.fileNameBytes = fileName.getBytes();
         this.offset = 0;
         _init();
     }
@@ -55,17 +57,31 @@ public class BinaryFileTransferProtocol {
     {
         ByteBuf buf = ByteBufAllocator.DEFAULT.buffer();
         buf.writeByte(MessageType.EOF);
+        buf.writeByte(fileNameBytes.length);
+        buf.writeBytes(fileNameBytes);
 
         ChannelFuture future = _ctx.writeAndFlush(buf).sync();
 
         if(!future.isSuccess())
         {
-            System.out.println(future.cause());
+//            System.out.println(future.cause());
         }
+    }
+
+    private void _sof(ChannelHandlerContext _ctx) throws InterruptedException
+    {
+        ByteBuf buf = ByteBufAllocator.DEFAULT.buffer();
+        buf.writeByte(MessageType.FILE_NAME_PACKET);
+        buf.writeByte(fileNameBytes.length);
+        buf.writeBytes(fileNameBytes);
+
+        _ctx.writeAndFlush(buf).sync();
     }
 
     public void handle(ChannelHandlerContext context) throws InterruptedException
     {
+        _sof(context);
+
         while(hasNext())
         {
             int loop = _size();
@@ -75,6 +91,8 @@ public class BinaryFileTransferProtocol {
                 ByteBuf bufWrap = ByteBufAllocator.DEFAULT.buffer();
                 bufWrap.writeByte(MessageType.TRANSFER_BIT_PACKET);
                 bufWrap.writeByte(buf.readByte());
+                bufWrap.writeByte(fileNameBytes.length);
+                bufWrap.writeBytes(fileNameBytes);
 
                 context.writeAndFlush(bufWrap).sync();
             }

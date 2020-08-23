@@ -13,11 +13,18 @@ public class FileResponseClientThread extends Thread {
 
     private FileTransferEvent event;
     private FileResponseBuffer buffer;
+    private String fileName;
 
-    public FileResponseClientThread(FileTransferEvent event, FileResponseBuffer buffer)
+    public FileResponseClientThread(FileTransferEvent event, String fileName, FileResponseBuffer buffer)
     {
         this.event = event;
+        this.fileName = fileName;
         this.buffer = buffer;
+    }
+
+    public String getWritingFileName()
+    {
+        return fileName;
     }
 
     @Override
@@ -29,8 +36,7 @@ public class FileResponseClientThread extends Thread {
 
         try
         {
-            //File name 받는거 필요함.
-            fos = new FileOutputStream("C://zeppy_client/a.txt");
+            fos = new FileOutputStream("C://zeppy_client/{file_name}".replace("{file_name}", fileName));
             bos = new BufferedOutputStream(fos);
 
             while(buf.hasNext())

@@ -16,14 +16,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
-public class FileTransferClient extends SimpleChannelInboundHandler<ByteBuf> implements ICommProtocol, FileTransferEvent, ProtocolDecoder {
+public class FileTransferClient extends SimpleChannelInboundHandler<ByteBuf> implements ICommProtocol, FileTransferEvent, ProtocolDecoder<String> {
 
     private int port;
     private EventLoopGroup group;
     private Logger logger;
     private Channel _server;
-    private FileResponseBuffer buffer;
+    private Map<String, FileResponseBuffer> buffers;
     private static final String CLIENT_BLOCK_FILE_PATH = "C://zeppy_client"; //test path
 
     /**
@@ -39,6 +41,7 @@ public class FileTransferClient extends SimpleChannelInboundHandler<ByteBuf> imp
         this.port = port;
         this.group = new NioEventLoopGroup();
         this.logger = LoggerFactory.getLogger(FileTransferClient.class);
+        this.buffers = new HashMap<>();
     }
 
     @Override
@@ -62,23 +65,34 @@ public class FileTransferClient extends SimpleChannelInboundHandler<ByteBuf> imp
 
         switch (messageType)
         {
+            case MessageType.FILE_NAME_PACKET:
+                createBuffer(_readFileName(buf));
+                break;
             case MessageType.TRANSFER_BIT_PACKET:
                 onReceivePacket(buf);
                 break;
             case MessageType.EOF:
-                logger.info("receive eof message");
-                if(buffer != null)
-                {
-                    Thread thread = new FileResponseClientThread(this::onTransferFinish, buffer);
-                    thread.start();
-                    logger.info("Received EOF packet, start write files");
-                }
+                String fileName = _readFileName(buf);
+                Thread thread = new FileResponseClientThread(this::onTransferFinish, fileName, buffers.get(fileName));
+                thread.start();
+                logger.info("Received EOF packet, start write files");
+
         }
     }
 
-    public synchronized void createBuffer()
+    private String _readFileName(ByteBuf buf)
     {
-        buffer = new FileResponseBuffer();
+        byte[] fileNameBytes = new byte[buf.readByte()];
+        buf.readBytes(fileNameBytes);
+
+        return new String(fileNameBytes);
+    }
+
+    public synchronized void createBuffer(String fileName)
+    {
+        FileResponseBuffer buffer = new FileResponseBuffer();
+
+        buffers.put(fileName, buffer);
     }
 
     public boolean createClientBlockFileDirectory()
@@ -87,28 +101,31 @@ public class FileTransferClient extends SimpleChannelInboundHandler<ByteBuf> imp
     }
 
     @Override
-    public void flush()
+    public void flush(String flushTarget)
     {
+        FileResponseBuffer buffer = buffers.get(flushTarget);
         buffer.flush();
-        buffer = null;
+
+        buffers.remove(flushTarget);
     }
 
     @Override
     public void onTransferFinish(Thread thread)
     {
-        flush();
+        FileResponseClientThread clientThread = (FileResponseClientThread) thread;
+
+        flush(clientThread.getWritingFileName());
         logger.info("Call transfer finish client");
     }
 
     @Override
     public void onReceivePacket(ByteBuf buf)
     {
-        if(buffer == null)
-        {
-            createBuffer();
-        }
+        byte data = buf.readByte();
+        String fileName = _readFileName(buf);
+        FileResponseBuffer buffer = buffers.get(fileName);
 
-        buffer.addBuffer(buf.readByte());
+        buffer.addBuffer(data);
     }
 
     @Override
