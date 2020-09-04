@@ -22,6 +22,7 @@
     <modules>
         <module>core</module>
         <module>network-core</module>
+        <module>dns-server</module>
     </modules>
 
     <dependencies>

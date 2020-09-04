@@ -39,7 +39,7 @@ public class MessageServer extends SimpleChannelInboundHandler<Message> implemen
     {
         IMessageHandler handler = null;
 
-        //TODO: Full chain download 요청 시 FileTransfer  server 로 리시브
+        //TODO: Full chain download 요청 시 FileTransfer server로 리시브
         switch (message.getType())
         {
             case MessageType.PING:
