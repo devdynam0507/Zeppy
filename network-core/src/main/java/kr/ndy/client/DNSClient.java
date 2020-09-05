@@ -7,7 +7,9 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 import kr.ndy.DNSInitializer;
 import kr.ndy.DNSQuery;
+import kr.ndy.p2p.Peer;
 import kr.ndy.protocol.ICommProtocol;
+import kr.ndy.p2p.P2P;
 import kr.ndy.server.ServerOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,16 +19,24 @@ public class DNSClient extends SimpleChannelInboundHandler<String> implements IC
     private Channel _server;
     private static final String NULL = "NULL";
     private Logger logger;
+    private P2P peers;
 
-    public DNSClient()
+    public DNSClient(P2P peers)
     {
         this.logger = LoggerFactory.getLogger(DNSClient.class);
+        this.peers  = peers;
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, String query) throws Exception
+    public void channelActive(ChannelHandlerContext ctx) throws Exception
     {
-        String content;
+        push();
+    }
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, String query) throws Exception
+    {
+        String content = null;
         if(isGetQuery(query))
         {
             String[] parsed = parseQuery(query);
@@ -44,10 +54,17 @@ public class DNSClient extends SimpleChannelInboundHandler<String> implements IC
                 logger.info("pushed full node addr");
                 break;
             case DNSQuery.FULL_NODE_ADDR_GET_SUCCESS:
+                peers.addPeers(Peer.create(content, true));
+                logger.info("add peer: " + content);
                 break;
             case DNSQuery.FULL_NODE_ADDR_GET_FAILED:
                 logger.info("failed get full node addr");
         }
+    }
+
+    public void push()
+    {
+        _server.writeAndFlush(DNSQuery.FULL_NODE_ADDR_PUSH);
     }
 
     @Override

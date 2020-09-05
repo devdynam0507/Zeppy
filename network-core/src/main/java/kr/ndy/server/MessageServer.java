@@ -10,6 +10,7 @@ import kr.ndy.codec.Message;
 import kr.ndy.codec.MessageType;
 import kr.ndy.codec.handler.IMessageHandler;
 import kr.ndy.codec.handler.MessageHandlerFactory;
+import kr.ndy.p2p.P2P;
 import kr.ndy.protocol.ICommProtocolConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,16 +23,18 @@ public class MessageServer extends SimpleChannelInboundHandler<Message> implemen
     private Logger logger;
     private EventLoopGroup parent, child;
     private int port;
+    private P2P peers;
 
     private Set<Channel> channels;
 
-    public MessageServer(int port)
+    public MessageServer(int port, P2P peers)
     {
         this.logger = LoggerFactory.getLogger(MessageServer.class);
         this.parent = new NioEventLoopGroup(ServerOptions.SERVER_SOCK_THREAD);
         this.child = new NioEventLoopGroup(ServerOptions.CHANNEL_SOCK_THREAD);
         this.port = port;
         this.channels = new HashSet<>();
+        this.peers = peers;
     }
 
     @Override
