@@ -9,15 +9,13 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import kr.ndy.protocol.ICommProtocol;
-import kr.ndy.server.MessageServer;
-import kr.ndy.server.ServerOptions;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 
-public class DNS extends SimpleChannelInboundHandler<String> implements ICommProtocol {
+public class DNS extends SimpleChannelInboundHandler<String> {
 
     private EventLoopGroup parent, child;
     private Logger logger;
@@ -26,15 +24,15 @@ public class DNS extends SimpleChannelInboundHandler<String> implements ICommPro
     public DNS(DNSCache cache)
     {
         this.logger = LoggerFactory.getLogger(DNS.class);
-        this.parent = new NioEventLoopGroup(ServerOptions.SERVER_SOCK_THREAD);
-        this.child = new NioEventLoopGroup(ServerOptions.CHANNEL_SOCK_THREAD);
+        this.parent = new NioEventLoopGroup(4);
+        this.child = new NioEventLoopGroup(1);
         this.cache = cache;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String query) throws Exception
     {
-        System.out.println(query);
+        logger.info("request query: " + query);
 
         switch (query)
         {
@@ -58,7 +56,6 @@ public class DNS extends SimpleChannelInboundHandler<String> implements ICommPro
         return sockAddress.getAddress().getHostAddress();
     }
 
-    @Override
     public void enable()
     {
         try
@@ -67,10 +64,10 @@ public class DNS extends SimpleChannelInboundHandler<String> implements ICommPro
             bootstrap.group(parent, child)
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 100)
-                    .handler(new LoggingHandler(MessageServer.class, LogLevel.INFO))
+                    .handler(new LoggingHandler(DNS.class, LogLevel.INFO))
                     .childHandler(new DNSInitializer(this));
 
-            bootstrap.bind(ServerOptions.DNS_SERVER_PORT).sync();
+            bootstrap.bind(23556).sync();
             logger.info("Initialized DNS bootstrap.. server enabled");
         } catch (InterruptedException e)
         {
@@ -78,7 +75,6 @@ public class DNS extends SimpleChannelInboundHandler<String> implements ICommPro
         }
     }
 
-    @Override
     public void disable()
     {
 

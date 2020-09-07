@@ -14,17 +14,22 @@ import kr.ndy.server.ServerOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DNSClient extends SimpleChannelInboundHandler<String> implements ICommProtocol {
 
     private Channel _server;
     private static final String NULL = "NULL";
     private Logger logger;
     private P2P peers;
+    private List<String> fullNodeCaches;
 
     public DNSClient(P2P peers)
     {
-        this.logger = LoggerFactory.getLogger(DNSClient.class);
-        this.peers  = peers;
+        this.logger         = LoggerFactory.getLogger(DNSClient.class);
+        this.peers          = peers;
+        this.fullNodeCaches = new ArrayList<>();
     }
 
     @Override
@@ -54,8 +59,12 @@ public class DNSClient extends SimpleChannelInboundHandler<String> implements IC
                 logger.info("pushed full node addr");
                 break;
             case DNSQuery.FULL_NODE_ADDR_GET_SUCCESS:
-                peers.addPeers(Peer.create(content, true));
-                logger.info("add peer: " + content);
+                if(!fullNodeCaches.contains(content))
+                {
+                    fullNodeCaches.add(content);
+                    logger.info("add full node address: " + content);
+                }
+
                 break;
             case DNSQuery.FULL_NODE_ADDR_GET_FAILED:
                 logger.info("failed get full node addr");
@@ -65,6 +74,11 @@ public class DNSClient extends SimpleChannelInboundHandler<String> implements IC
     public void push()
     {
         _server.writeAndFlush(DNSQuery.FULL_NODE_ADDR_PUSH);
+    }
+
+    public void requestAddress()
+    {
+        _server.writeAndFlush(DNSQuery.FULL_NODE_ADDR_GET);
     }
 
     @Override

@@ -10,11 +10,12 @@ public class Main {
     public static void main(String... args)
     {
         P2P peers = new P2P();
+        DNSClient dnsClient = new DNSClient(peers);
 
-        ServerExecutor executor = new ServerExecutor
+        ProtocolExecutor executor = new ProtocolExecutor
         (
-                new DNSClient(peers),
-                new MessageServer(ServerOptions.TEST_MESSAGE_SERVER_PORT, peers),
+                dnsClient,
+                new MessageServer(ServerOptions.TEST_MESSAGE_SERVER_PORT, peers, dnsClient),
                 new FileTransferSever(ServerOptions.TEST_FILE_TRANSFER_SERVER_PORT)
         );
         executor.executeService();

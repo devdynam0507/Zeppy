@@ -6,6 +6,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import kr.ndy.client.DNSClient;
 import kr.ndy.codec.Message;
 import kr.ndy.codec.MessageType;
 import kr.ndy.codec.handler.IMessageHandler;
@@ -24,17 +25,19 @@ public class MessageServer extends SimpleChannelInboundHandler<Message> implemen
     private EventLoopGroup parent, child;
     private int port;
     private P2P peers;
+    private DNSClient dnsClient;
 
     private Set<Channel> channels;
 
-    public MessageServer(int port, P2P peers)
+    public MessageServer(int port, P2P peers, DNSClient dnsClient)
     {
-        this.logger = LoggerFactory.getLogger(MessageServer.class);
-        this.parent = new NioEventLoopGroup(ServerOptions.SERVER_SOCK_THREAD);
-        this.child = new NioEventLoopGroup(ServerOptions.CHANNEL_SOCK_THREAD);
-        this.port = port;
-        this.channels = new HashSet<>();
-        this.peers = peers;
+        this.logger    = LoggerFactory.getLogger(MessageServer.class);
+        this.parent    = new NioEventLoopGroup(ServerOptions.SERVER_SOCK_THREAD);
+        this.child     = new NioEventLoopGroup(ServerOptions.CHANNEL_SOCK_THREAD);
+        this.port      = port;
+        this.channels  = new HashSet<>();
+        this.peers     = peers;
+        this.dnsClient = dnsClient;
     }
 
     @Override
@@ -48,6 +51,8 @@ public class MessageServer extends SimpleChannelInboundHandler<Message> implemen
             case MessageType.PING:
                 handler = MessageHandlerFactory.getMessageHandlerFactory(MessageType.OK);
                 break;
+            case MessageType.REQUEST_PEERS:
+
         }
 
         handler.handle(ctx, message, this, logger);

@@ -7,10 +7,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
-import kr.ndy.protocol.ICommProtocol;
-import kr.ndy.server.ServerExecutor;
-import kr.ndy.server.ServerOptions;
-
 public class Application {
 
     public static ChannelFuture future;
@@ -18,12 +14,8 @@ public class Application {
     public static void main(String[] args)
     {
         DNSCache cache = new DNSCache();
-        ICommProtocol dns = new DNS(cache);
-        ServerExecutor executor = new ServerExecutor(dns);
-
-        executor.executeService();
-
-        testEnable();
+        DNS dns = new DNS(cache);
+        dns.enable();
     }
 
     public static void testEnable()
@@ -46,7 +38,7 @@ public class Application {
 
         try
         {
-            future = bootstrap.connect("localhost", ServerOptions.DNS_SERVER_PORT).sync();
+            future = bootstrap.connect("localhost", 23556).sync();
 
             while(true)
             {
