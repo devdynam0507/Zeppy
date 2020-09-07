@@ -33,12 +33,6 @@ public class DNSClient extends SimpleChannelInboundHandler<String> implements IC
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception
-    {
-        push();
-    }
-
-    @Override
     protected void channelRead0(ChannelHandlerContext ctx, String query) throws Exception
     {
         String content = null;
@@ -94,7 +88,7 @@ public class DNSClient extends SimpleChannelInboundHandler<String> implements IC
         try
         {
             //TODO: DNS서버 주소로 변경
-            _server = bootstrap.connect("localhost", ServerOptions.DNS_SERVER_PORT).sync().channel();
+            _server = bootstrap.connect("158.247.203.223", ServerOptions.DNS_SERVER_PORT).sync().channel();
         } catch (InterruptedException e)
         {
         }

@@ -15,5 +15,6 @@ public class MessageType {
     public static final byte TRANSFER_BIT_PACKET        = 0x00000009;
     public static final byte FILE_NAME_PACKET           = 0x0000000B;
     public static final byte REQUEST_PEERS              = 0x0000001A;
+    public static final byte RESPONSE_PEERS             = 0x0000002A;
 
 }

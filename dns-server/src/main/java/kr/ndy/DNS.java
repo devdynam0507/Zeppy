@@ -25,8 +25,8 @@ public class DNS extends SimpleChannelInboundHandler<String> {
     {
         this.logger = LoggerFactory.getLogger(DNS.class);
         this.parent = new NioEventLoopGroup(4);
-        this.child = new NioEventLoopGroup(1);
-        this.cache = cache;
+        this.child  = new NioEventLoopGroup(1);
+        this.cache  = cache;
     }
 
     @Override

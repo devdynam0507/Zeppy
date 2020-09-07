@@ -16,7 +16,8 @@ public class MessageHandlerFactory {
             case MessageType.OK:
                 handler = new PingPongOK();
                 break;
-            case MessageType.REQUEST_DNS_FULL_NODE:
+            case MessageType.REQUEST_PEERS:
+                handler = new RequestPeers();
                 break;
         }
 

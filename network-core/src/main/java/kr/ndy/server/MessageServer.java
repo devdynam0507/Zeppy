@@ -12,10 +12,12 @@ import kr.ndy.codec.MessageType;
 import kr.ndy.codec.handler.IMessageHandler;
 import kr.ndy.codec.handler.MessageHandlerFactory;
 import kr.ndy.p2p.P2P;
+import kr.ndy.p2p.Peer;
 import kr.ndy.protocol.ICommProtocolConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -52,11 +54,14 @@ public class MessageServer extends SimpleChannelInboundHandler<Message> implemen
                 handler = MessageHandlerFactory.getMessageHandlerFactory(MessageType.OK);
                 break;
             case MessageType.REQUEST_PEERS:
-
+                handler = MessageHandlerFactory.getMessageHandlerFactory(MessageType.REQUEST_PEERS);
+                break;
         }
 
         handler.handle(ctx, message, this, logger);
     }
+
+    public P2P getPeers() { return peers; }
 
     @Override
     public void enable()
@@ -94,7 +99,10 @@ public class MessageServer extends SimpleChannelInboundHandler<Message> implemen
     @Override
     public void establish(Channel channel)
     {
-        channels.add(channel);
-        logger.info("Establish connection client: {id}".replace("{id}", channel.id().asLongText()));
+        InetSocketAddress socketAddress = (InetSocketAddress) channel.remoteAddress();
+        String hostAddress = socketAddress.getAddress().getHostAddress();
+        peers.addPeers(Peer.create(hostAddress,true)); //피어 연결 확립.
+
+        logger.info("establish connection client: {ip}".replace("{ip}", hostAddress));
     }
 }

@@ -8,6 +8,7 @@ import kr.ndy.codec.Message;
 import kr.ndy.codec.MessageType;
 import kr.ndy.codec.handler.IMessageHandler;
 import kr.ndy.codec.handler.MessageHandlerFactory;
+import kr.ndy.p2p.P2P;
 import kr.ndy.protocol.ICommProtocolConnection;
 
 import kr.ndy.server.ServerOptions;
@@ -26,14 +27,18 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
     private Set<Channel> channels;
     private Logger logger;
     private FileTransferClient _ftClient;
+    private P2P peers;
+    private DNSClient dnsClient;
 
-    public MessageClient(/* Todo: param  dns  seeds */int port)
+    public MessageClient(int port, P2P peers, DNSClient dnsClient)
     {
-        this.port = port;
-        this.group = new NioEventLoopGroup();
+        this.port        = port;
+        this.group       = new NioEventLoopGroup();
         this.initializer = new ClientInitializer(this);
-        this.channels = new HashSet<>();
-        this.logger = LoggerFactory.getLogger(MessageClient.class);
+        this.channels    = new HashSet<>();
+        this.logger      = LoggerFactory.getLogger(MessageClient.class);
+        this.peers       = peers;
+        this.dnsClient   = dnsClient;
 
         connectFileTransferSever(); //ftp 서버랑 연결
     }
@@ -44,7 +49,7 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception
     {
-        IMessageHandler message = MessageHandlerFactory.getMessageHandlerFactory(MessageType.PING);
+        IMessageHandler message = MessageHandlerFactory.getMessageHandlerFactory(MessageType.PING); //핑메세지 날림.
         message.handle(ctx, null, null, logger);
     }
 
@@ -96,6 +101,7 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
 
         try
         {
+            //TODO: Full  node  주소로 바꿔야함
             bootstrap.connect("localhost", port).sync();
         } catch (InterruptedException e)
         {
