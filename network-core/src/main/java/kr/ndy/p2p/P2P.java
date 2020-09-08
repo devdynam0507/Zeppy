@@ -20,7 +20,16 @@ public class P2P implements IJsonSerializable {
         peers.add(peer);
     }
 
-    //TODO: to  json serialize
+    public Peer getPeer(String hostAddress)
+    {
+        return peers.stream().filter(i -> i.getAddress().equals(hostAddress)).findFirst().orElse(null);
+    }
+
+    public void removePeer(Peer peer)
+    {
+        peers.remove(peer);
+    }
+
     @Override
     public String toJson()
     {

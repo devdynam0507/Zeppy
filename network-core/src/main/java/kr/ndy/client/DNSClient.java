@@ -7,7 +7,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 import kr.ndy.DNSInitializer;
 import kr.ndy.DNSQuery;
-import kr.ndy.p2p.Peer;
 import kr.ndy.protocol.ICommProtocol;
 import kr.ndy.p2p.P2P;
 import kr.ndy.server.ServerOptions;
@@ -70,10 +69,17 @@ public class DNSClient extends SimpleChannelInboundHandler<String> implements IC
         _server.writeAndFlush(DNSQuery.FULL_NODE_ADDR_PUSH);
     }
 
-    public void requestAddress()
+    public void requestAddress() throws InterruptedException
     {
-        _server.writeAndFlush(DNSQuery.FULL_NODE_ADDR_GET);
+        _server.writeAndFlush(DNSQuery.FULL_NODE_ADDR_GET).sync();
     }
+
+    public void inactive(String hostAddress)
+    {
+        fullNodeCaches.remove(hostAddress);
+    }
+
+    public List<String> getFullNodeCaches() { return fullNodeCaches; }
 
     @Override
     public void enable()

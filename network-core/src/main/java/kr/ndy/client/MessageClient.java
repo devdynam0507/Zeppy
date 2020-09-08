@@ -5,17 +5,23 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import kr.ndy.codec.Message;
+import kr.ndy.codec.MessageBuilder;
 import kr.ndy.codec.MessageType;
 import kr.ndy.codec.handler.IMessageHandler;
 import kr.ndy.codec.handler.MessageHandlerFactory;
 import kr.ndy.p2p.P2P;
+import kr.ndy.p2p.Peer;
 import kr.ndy.protocol.ICommProtocolConnection;
 
 import kr.ndy.server.ServerOptions;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class MessageClient extends SimpleChannelInboundHandler<Message> implements ICommProtocolConnection {
@@ -25,10 +31,13 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
     private EventLoopGroup group;
     private ClientInitializer initializer;
     private Set<Channel> channels;
-    private Logger logger;
     private FileTransferClient _ftClient;
     private P2P peers;
     private DNSClient dnsClient;
+    private ChannelFuture _server; //Full node channel
+
+    //static members
+    private static Logger logger = LoggerFactory.getLogger(MessageClient.class);
 
     public MessageClient(int port, P2P peers, DNSClient dnsClient)
     {
@@ -36,7 +45,6 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
         this.group       = new NioEventLoopGroup();
         this.initializer = new ClientInitializer(this);
         this.channels    = new HashSet<>();
-        this.logger      = LoggerFactory.getLogger(MessageClient.class);
         this.peers       = peers;
         this.dnsClient   = dnsClient;
 
@@ -51,17 +59,51 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
     {
         IMessageHandler message = MessageHandlerFactory.getMessageHandlerFactory(MessageType.PING); //핑메세지 날림.
         message.handle(ctx, null, null, logger);
+
+        ctx.writeAndFlush(MessageBuilder.builder().type(MessageType.REQUEST_PEERS));
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception
+    {
+        InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
+        String hostAddress        = address.getAddress().getHostAddress();
+
+        _server = null;
+        peers.removePeer(peers.getPeer(hostAddress));
+        dnsClient.inactive(hostAddress);
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message message) throws Exception
     {
+        InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
+        String hostAddress        = address.getAddress().getHostAddress();
+
         switch (message.getType())
         {
             case MessageType.OK:
                 establish(ctx.channel());
+                peers.addPeers(Peer.create(hostAddress, true));
                 break;
+            case MessageType.RESPONSE_PEERS:
+                JSONObject jsonObject = message.getJson();
+                int size              = (int) jsonObject.get("size");
 
+                logger.info("Client response peer size: " + size);
+                logger.info("If isn't size is an 0, Add new peers to node");
+                if(size > 0)
+                {
+                    Bootstrap bootstrap = getBootstrap();
+
+                    for(int i = 0; i < size; i++)
+                    {
+                        hostAddress                 = (String) jsonObject.get(i);
+                        ChannelFuture channelFuture = bootstrap.connect(hostAddress, port).sync();
+                        group.register(channelFuture.channel());
+                        logger.info("Connected to " + hostAddress);
+                    }
+                }
         }
     }
 
@@ -83,6 +125,14 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
         }
     }
 
+    public void refresh()
+    {
+        if(_server == null)
+        {
+            enable();
+        }
+    }
+
     @Override
     public void establish(Channel channel)
     {
@@ -90,19 +140,28 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
         logger.info("Success established connection server: {id}".replace("{id}", channel.id().asLongText()));
     }
 
-    @Override
-    public void enable()
+    public Bootstrap getBootstrap()
     {
         Bootstrap bootstrap = new Bootstrap();
-
         bootstrap.channel(NioSocketChannel.class)
                 .group(group)
                 .handler(initializer);
 
+        return bootstrap;
+    }
+
+    @Override
+    public void enable()
+    {
+        Bootstrap bootstrap = getBootstrap();
+
         try
         {
-            //TODO: Full  node  주소로 바꿔야함
-            bootstrap.connect("localhost", port).sync();
+            List<String> fullNodeAddress = dnsClient.getFullNodeCaches();
+            if(fullNodeAddress.size() > 0)
+            {
+                _server = bootstrap.connect(fullNodeAddress.get(0), port).sync();
+            }
         } catch (InterruptedException e)
         {
             disable();
