@@ -17,7 +17,10 @@ public class P2P implements IJsonSerializable {
 
     public void addPeers(Peer peer)
     {
-        peers.add(peer);
+        if(!peers.contains(peer))
+        {
+            peers.add(peer);
+        }
     }
 
     public Peer getPeer(String hostAddress)
@@ -28,6 +31,11 @@ public class P2P implements IJsonSerializable {
     public void removePeer(Peer peer)
     {
         peers.remove(peer);
+    }
+
+    public synchronized List<Peer> getPeers()
+    {
+        return peers;
     }
 
     @Override

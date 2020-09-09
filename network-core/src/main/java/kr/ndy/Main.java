@@ -24,6 +24,13 @@ public class Main {
         //TODO: 그러면 풀노드는 그냥 연결만 받고 피어만 반환해주면 될듯함.
         //TODO: 처음에 PING-PONG Message 주고받으면서 OK 사인 반환하면 노드 연결 확립해주면 될듯!
 
+        // ============= 내일 테스트 할거  ===========
+        //TODO: DNS에서  풀노드  주소 받아오기.
+        //TODO: 풀노드랑  연결  후 피어들 받아오기
+        //TODO: 피어들과 연결  확릴  후  주기적으로  핑메세지  보냄
+
+        //TODO: 가상화폐를 네트와크와 연동
+
         //모든 Server/Client 연결
         ProtocolExecutor executor = new ProtocolExecutor
         (

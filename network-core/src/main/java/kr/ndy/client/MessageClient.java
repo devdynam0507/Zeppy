@@ -9,6 +9,7 @@ import kr.ndy.codec.MessageBuilder;
 import kr.ndy.codec.MessageType;
 import kr.ndy.codec.handler.IMessageHandler;
 import kr.ndy.codec.handler.MessageHandlerFactory;
+import kr.ndy.codec.handler.Ping;
 import kr.ndy.p2p.P2P;
 import kr.ndy.p2p.Peer;
 import kr.ndy.protocol.ICommProtocolConnection;
@@ -19,11 +20,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * 모든 소켓 관련 처리는 이 클래스에서 합니다.
+ * 피어간 통신을 담당하는 클래스입니다.
+ * */
 public class MessageClient extends SimpleChannelInboundHandler<Message> implements ICommProtocolConnection {
 
     //TODO: add dns seeds member variable
@@ -77,14 +81,10 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message message) throws Exception
     {
-        InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
-        String hostAddress        = address.getAddress().getHostAddress();
-
         switch (message.getType())
         {
             case MessageType.OK:
                 establish(ctx.channel());
-                peers.addPeers(Peer.create(hostAddress, true));
                 break;
             case MessageType.RESPONSE_PEERS:
                 JSONObject jsonObject = message.getJson();
@@ -98,9 +98,10 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
 
                     for(int i = 0; i < size; i++)
                     {
-                        hostAddress                 = (String) jsonObject.get(i);
-                        ChannelFuture channelFuture = bootstrap.connect(hostAddress, port).sync();
-                        group.register(channelFuture.channel());
+                        String hostAddress          = (String) jsonObject.get(i);
+                        Channel channel = bootstrap.connect(hostAddress, port).sync().channel();
+                        group.register(channel);
+                        peers.addPeers(Peer.create(hostAddress, channel, true));
                         logger.info("Connected to " + hostAddress);
                     }
                 }
@@ -123,6 +124,29 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
             _ftClient = new FileTransferClient(ServerOptions.TEST_FILE_TRANSFER_SERVER_PORT);
             _ftClient.enable();
         }
+    }
+
+    public void sendPingToPeers()
+    {
+        List<Peer> activePeers = peers.getPeers();
+
+        for(Peer peer : activePeers)
+        {
+            boolean isSuccess = sendMessage(peer, MessageBuilder.builder()
+                    .type(MessageType.PING)
+                    .json(new Ping())
+                    .create());
+
+            if(!isSuccess)
+            {
+                logger.info(peer.getAddress() + " is died");
+            }
+        }
+    }
+
+    public boolean sendMessage(Peer peer, Message message)
+    {
+        return peer.sendMessage(message);
     }
 
     public void refresh()

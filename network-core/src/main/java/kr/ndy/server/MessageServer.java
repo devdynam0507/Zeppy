@@ -101,7 +101,7 @@ public class MessageServer extends SimpleChannelInboundHandler<Message> implemen
     {
         InetSocketAddress socketAddress = (InetSocketAddress) channel.remoteAddress();
         String hostAddress = socketAddress.getAddress().getHostAddress();
-        peers.addPeers(Peer.create(hostAddress,true)); //피어 연결 확립.
+        peers.addPeers(Peer.create(hostAddress,channel, true)); //피어 연결 확립.
 
         logger.info("establish connection client: {ip}".replace("{ip}", hostAddress));
     }
