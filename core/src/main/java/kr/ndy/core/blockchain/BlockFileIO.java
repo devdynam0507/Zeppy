@@ -13,6 +13,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class BlockFileIO {
 
     protected static final String BLOCK_FILE_EXTENSION = ".zblk";
+    public static final String BLOCK_FILE_DIRECTORY = System.getProperty("user.dir") + "/blocks";
 
     private Logger logger;
     private final ReadWriteLock lock;
@@ -29,7 +30,7 @@ public class BlockFileIO {
 
     private File mkdir()
     {
-        File file = new File("C://Zeppy");
+        File file = new File(BLOCK_FILE_DIRECTORY);
         file.mkdir();
 
         return file;
@@ -45,17 +46,23 @@ public class BlockFileIO {
         Vector<BlockHeader> blocks = new Vector<>();
         File[] files = getFullBlockFiles();
 
-        for(File file : files)
+        if(files != null && files.length > 0)
         {
-            BlockHeader header = read(file);
-
-            if(header != null)
+            for(File file : files)
             {
-                blocks.add(header);
-            }
-        }
+                BlockHeader header = read(file);
 
-        logger.info("Loads " + blocks.size() + " blocks from disk and loads them");
+                if(header != null)
+                {
+                    blocks.add(header);
+                }
+            }
+
+            logger.info("Loads " + blocks.size() + " blocks from disk and loads them");
+        }else
+        {
+            logger.info("Block file's null");
+        }
 
         return blocks;
     }
@@ -100,7 +107,7 @@ public class BlockFileIO {
 
         try
         {
-            fos = new FileOutputStream("C://Zeppy/" + fileName);
+            fos = new FileOutputStream(BLOCK_FILE_DIRECTORY + fileName);
             bos = new BufferedOutputStream(fos);
 
             writeLock.lock();
