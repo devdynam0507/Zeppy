@@ -1,12 +1,10 @@
 package kr.ndy;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
+@ChannelHandler.Sharable
 public class DNSInitializer extends ChannelInitializer {
 
     private SimpleChannelInboundHandler<String> handler;
