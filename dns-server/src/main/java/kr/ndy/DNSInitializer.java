@@ -4,7 +4,6 @@ import io.netty.channel.*;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
-@ChannelHandler.Sharable
 public class DNSInitializer extends ChannelInitializer {
 
     private SimpleChannelInboundHandler<String> handler;

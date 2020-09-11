@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+@ChannelHandler.Sharable
 public class DNSClient extends SimpleChannelInboundHandler<String> implements ICommProtocol {
 
     private Channel _server;
