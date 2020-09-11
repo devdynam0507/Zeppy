@@ -64,7 +64,6 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
         IMessageHandler message = MessageHandlerFactory.getMessageHandlerFactory(MessageType.PING); //핑메세지 날림.
         message.handle(ctx, null, null, logger);
 
-        dnsClient.push();
         ctx.writeAndFlush(MessageBuilder.builder().type(MessageType.REQUEST_PEERS));
     }
 

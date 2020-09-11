@@ -33,6 +33,12 @@ public class DNSClient extends SimpleChannelInboundHandler<String> implements IC
     }
 
     @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception
+    {
+        push();
+    }
+
+    @Override
     protected void channelRead0(ChannelHandlerContext ctx, String query) throws Exception
     {
         String content = null;
