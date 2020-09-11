@@ -7,6 +7,7 @@ C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\client\task
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\p2p\Peer.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\client\ClientInitializer.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\IJsonSerializable.java
+C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\NetworkTestApp.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\protocol\ICommProtocol.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\MessageBuilder.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\server\ProtocolExecutor.java
@@ -31,5 +32,4 @@ C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\Messa
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\p2p\P2P.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\handler\Ping.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\MessageDecoder.java
-C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\Main.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\server\task\FileResponseServerThread.java

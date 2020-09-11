@@ -43,7 +43,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        kr.ndy.Main
+                                        kr.ndy.NetworkTestApp
                                     </mainClass>
                                 </manifest>
                             </archive>

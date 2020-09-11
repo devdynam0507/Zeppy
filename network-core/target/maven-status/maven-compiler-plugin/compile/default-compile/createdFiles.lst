@@ -5,8 +5,8 @@ kr\ndy\client\DNSClient.class
 kr\ndy\p2p\Peer.class
 kr\ndy\codec\MessageDecoder.class
 kr\ndy\client\FileResponseBuffer.class
+kr\ndy\NetworkTestApp.class
 kr\ndy\codec\handler\ReadWriteable.class
-kr\ndy\Main.class
 kr\ndy\codec\handler\IMessageHandler.class
 kr\ndy\codec\handler\Ping.class
 kr\ndy\codec\MessageBuilder.class
