@@ -185,6 +185,7 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
             if(fullNodeAddress.size() > 0)
             {
                 _server = bootstrap.connect(fullNodeAddress.get(0), port).sync();
+                logger.info("Connected to " + _server.channel().remoteAddress().toString());
             }
         } catch (InterruptedException e)
         {
