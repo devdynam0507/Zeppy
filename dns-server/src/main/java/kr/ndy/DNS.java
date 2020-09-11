@@ -31,6 +31,7 @@ public class DNS extends SimpleChannelInboundHandler<String> {
     protected void channelRead0(ChannelHandlerContext ctx, String query) throws Exception
     {
         logger.info("request query: " + query);
+        logger.info("caches: " + cache.toString());
 
         switch (query)
         {

@@ -43,4 +43,11 @@ public class DNSCache {
         return pick;
     }
 
+    @Override
+    public String toString()
+    {
+        return "DNSCache{" +
+                "addressCache=" + addressCache +
+                '}';
+    }
 }
