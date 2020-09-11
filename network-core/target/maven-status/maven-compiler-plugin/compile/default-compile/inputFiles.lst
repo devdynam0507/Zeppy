@@ -3,6 +3,7 @@ C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\client\task
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\file\FileTransferStreamOptions.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\server\ServerOptions.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\client\DNSClient.java
+C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\client\task\MessageClientDNSRefreshTask.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\p2p\Peer.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\client\ClientInitializer.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\IJsonSerializable.java
@@ -17,6 +18,7 @@ C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\handl
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\handler\PingPongOK.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\server\task\FileTransferEvent.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\MessageType.java
+C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\handler\RequestPeers.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\server\MessageServer.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\handler\ReadWriteable.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\protocol\BinaryFileTransferProtocol.java

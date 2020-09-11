@@ -52,7 +52,7 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
         this.peers       = peers;
         this.dnsClient   = dnsClient;
 
-        connectFileTransferSever(); //ftp 서버랑 연결
+        //connectFileTransferSever(); //ftp 서버랑 연결
     }
 
     /**
