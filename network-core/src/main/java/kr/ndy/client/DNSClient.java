@@ -26,6 +26,7 @@ public class DNSClient extends SimpleChannelInboundHandler<String> implements IC
     private P2P peers;
     private List<String> fullNodeCaches;
     private DNSEventHandlerRegister handlerRegister;
+    private boolean bPushedServer;
 
     public DNSClient(P2P peers, DNSEventHandlerRegister register)
     {
@@ -33,6 +34,7 @@ public class DNSClient extends SimpleChannelInboundHandler<String> implements IC
         this.peers           = peers;
         this.fullNodeCaches  = new ArrayList<>();
         this.handlerRegister = register;
+        this.bPushedServer   = false;
     }
 
     @Override
@@ -59,6 +61,7 @@ public class DNSClient extends SimpleChannelInboundHandler<String> implements IC
         switch (query)
         {
             case DNSQuery.FULL_NODE_ADDR_PUSH_SUCCESS:
+                bPushedServer = true;
                 logger.info("pushed full node addr");
                 break;
             case DNSQuery.FULL_NODE_ADDR_GET_SUCCESS:
@@ -82,7 +85,10 @@ public class DNSClient extends SimpleChannelInboundHandler<String> implements IC
 
     public void requestAddress() throws InterruptedException
     {
-        _server.writeAndFlush(DNSQuery.FULL_NODE_ADDR_GET).sync();
+        if(bPushedServer)
+        {
+            _server.writeAndFlush(DNSQuery.FULL_NODE_ADDR_GET).sync();
+        }
     }
 
     public void inactive(String hostAddress)
