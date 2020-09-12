@@ -108,10 +108,12 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
 
         try
         {
-            Channel channel     = bootstrap.connect(hostAddress, port).sync().channel();
+            Channel channel = bootstrap.connect(hostAddress, port).sync().channel();
 
             group.register(channel);
             peers.addPeers(Peer.create(hostAddress, channel, true));
+            channel.writeAndFlush(MessageType.REQUEST_PEERS);
+
             logger.info("Connected to " + hostAddress);
         } catch (InterruptedException e)
         {
@@ -166,19 +168,13 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
         return peer.sendMessage(message);
     }
 
-    public void refresh()
-    {
-        if(_server == null)
-        {
-            enable();
-        }
-    }
-
     @Override
     public void establish(Channel channel)
     {
         channels.add(channel);
         logger.info("Success established connection server: {id}".replace("{id}", channel.id().asLongText()));
+
+        sendPingToPeers();
     }
 
     public Bootstrap getBootstrap()
