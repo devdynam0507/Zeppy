@@ -11,6 +11,7 @@ C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\NetworkTest
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\protocol\ICommProtocol.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\MessageBuilder.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\server\ProtocolExecutor.java
+C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\client\callback\DNSEvent.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\client\FileTransferClient.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\server\MessageServerInitializer.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\server\FileTransferSever.java
@@ -25,6 +26,7 @@ C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\handl
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\protocol\BinaryFileTransferProtocol.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\protocol\ICommProtocolConnection.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\client\MessageClient.java
+C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\client\callback\DNSEventHandlerRegister.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\client\FileResponseBuffer.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\file\FileTransferStream.java
 C:\Users\user\IdeaProjects\Bitcoin\network-core\src\main\java\kr\ndy\codec\handler\IMessageHandler.java

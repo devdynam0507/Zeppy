@@ -20,7 +20,6 @@ public class MessageClientDNSRefreshTask extends Thread {
         try
         {
             dnsClient.requestAddress();
-            messageClient.refresh();
         } catch (InterruptedException e)
         {
             e.printStackTrace();

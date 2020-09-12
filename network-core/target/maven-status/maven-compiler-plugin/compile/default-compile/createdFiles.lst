@@ -17,6 +17,7 @@ kr\ndy\server\FileTransferSever.class
 kr\ndy\client\MessageClient.class
 kr\ndy\codec\Message.class
 kr\ndy\client\task\MessageClientDNSRefreshTask.class
+kr\ndy\client\callback\DNSEvent.class
 kr\ndy\codec\MessageEncoder.class
 kr\ndy\protocol\ProtocolDecoder.class
 kr\ndy\server\ServerOptions.class
@@ -32,4 +33,5 @@ kr\ndy\server\ProtocolExecutor.class
 kr\ndy\client\ClientInitializer.class
 kr\ndy\codec\handler\RequestPeers.class
 kr\ndy\server\MessageServer.class
+kr\ndy\client\callback\DNSEventHandlerRegister.class
 kr\ndy\codec\file\FileTransferStreamOptions.class

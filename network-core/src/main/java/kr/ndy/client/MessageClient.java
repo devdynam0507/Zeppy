@@ -4,6 +4,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import kr.ndy.client.callback.DNSEvent;
 import kr.ndy.codec.Message;
 import kr.ndy.codec.MessageBuilder;
 import kr.ndy.codec.MessageType;
@@ -28,7 +29,7 @@ import java.util.Set;
  * 모든 소켓 관련 처리는 이 클래스에서 합니다.
  * 피어간 통신을 담당하는 클래스입니다.
  * */
-public class MessageClient extends SimpleChannelInboundHandler<Message> implements ICommProtocolConnection {
+public class MessageClient extends SimpleChannelInboundHandler<Message> implements ICommProtocolConnection, DNSEvent {
 
     //TODO: add dns seeds member variable
     private int port;
@@ -63,8 +64,6 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
     {
         IMessageHandler message = MessageHandlerFactory.getMessageHandlerFactory(MessageType.PING); //핑메세지 날림.
         message.handle(ctx, null, null, logger);
-
-        ctx.writeAndFlush(MessageBuilder.builder().type(MessageType.REQUEST_PEERS));
     }
 
     @Override
@@ -94,18 +93,36 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
                 logger.info("If isn't size is an 0, Add new peers to node");
                 if(size > 0)
                 {
-                    Bootstrap bootstrap = getBootstrap();
-
                     for(int i = 0; i < size; i++)
                     {
-                        String hostAddress          = (String) jsonObject.get(i);
-                        Channel channel = bootstrap.connect(hostAddress, port).sync().channel();
-                        group.register(channel);
-                        peers.addPeers(Peer.create(hostAddress, channel, true));
-                        logger.info("Connected to " + hostAddress);
+                        String hostAddress = (String) jsonObject.get(i);
+                        connectPeer(hostAddress);
                     }
                 }
         }
+    }
+
+    public void connectPeer(String hostAddress)
+    {
+        Bootstrap bootstrap = getBootstrap();
+
+        try
+        {
+            Channel channel     = bootstrap.connect(hostAddress, port).sync().channel();
+
+            group.register(channel);
+            peers.addPeers(Peer.create(hostAddress, channel, true));
+            logger.info("Connected to " + hostAddress);
+        } catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onGetNodeAddress(String fullNodeAddress)
+    {
+        connectPeer(fullNodeAddress);
     }
 
     private void releaseFileTransferServer()

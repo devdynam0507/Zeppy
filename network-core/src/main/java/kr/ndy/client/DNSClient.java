@@ -7,6 +7,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 import kr.ndy.DNSInitializer;
 import kr.ndy.DNSQuery;
+import kr.ndy.client.callback.DNSEventHandlerRegister;
 import kr.ndy.protocol.ICommProtocol;
 import kr.ndy.p2p.P2P;
 import kr.ndy.server.ServerOptions;
@@ -24,12 +25,14 @@ public class DNSClient extends SimpleChannelInboundHandler<String> implements IC
     private Logger logger;
     private P2P peers;
     private List<String> fullNodeCaches;
+    private DNSEventHandlerRegister handlerRegister;
 
-    public DNSClient(P2P peers)
+    public DNSClient(P2P peers, DNSEventHandlerRegister register)
     {
-        this.logger         = LoggerFactory.getLogger(DNSClient.class);
-        this.peers          = peers;
-        this.fullNodeCaches = new ArrayList<>();
+        this.logger          = LoggerFactory.getLogger(DNSClient.class);
+        this.peers           = peers;
+        this.fullNodeCaches  = new ArrayList<>();
+        this.handlerRegister = register;
     }
 
     @Override
@@ -62,6 +65,7 @@ public class DNSClient extends SimpleChannelInboundHandler<String> implements IC
                 if(!fullNodeCaches.contains(content))
                 {
                     fullNodeCaches.add(content);
+                    handlerRegister.callOnGetNodeAddress(content);
                     logger.info("add full node address: " + content);
                 }
 
