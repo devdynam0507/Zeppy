@@ -75,9 +75,9 @@ public class DNSClient extends SimpleChannelInboundHandler<String> implements IC
         }
     }
 
-    public void push()
+    public void push() throws InterruptedException
     {
-        _server.writeAndFlush(DNSQuery.FULL_NODE_ADDR_PUSH);
+        _server.writeAndFlush(DNSQuery.FULL_NODE_ADDR_PUSH).sync();
     }
 
     public void requestAddress() throws InterruptedException
