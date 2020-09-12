@@ -112,7 +112,6 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
 
             group.register(channel);
             peers.addPeers(Peer.create(hostAddress, channel, true));
-            channel.writeAndFlush(MessageType.REQUEST_PEERS);
 
             logger.info("Connected to " + hostAddress);
         } catch (InterruptedException e)
@@ -171,7 +170,14 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
     @Override
     public void establish(Channel channel)
     {
-        channels.add(channel);
+        try
+        {
+            channel.writeAndFlush(MessageType.REQUEST_PEERS).sync();
+        } catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+
         logger.info("Success established connection server: {id}".replace("{id}", channel.id().asLongText()));
     }
 
