@@ -173,6 +173,7 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
         try
         {
             channel.writeAndFlush(MessageBuilder.builder()
+                    .json("")
                     .type(MessageType.REQUEST_PEERS)
                     .create()
             ).sync();
