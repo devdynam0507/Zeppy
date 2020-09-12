@@ -172,7 +172,10 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
     {
         try
         {
-            channel.writeAndFlush(MessageType.REQUEST_PEERS).sync();
+            channel.writeAndFlush(MessageBuilder.builder()
+                    .type(MessageType.REQUEST_PEERS)
+                    .create()
+            ).sync();
         } catch (InterruptedException e)
         {
             e.printStackTrace();
