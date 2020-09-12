@@ -11,6 +11,7 @@ import kr.ndy.codec.MessageType;
 import kr.ndy.codec.handler.IMessageHandler;
 import kr.ndy.codec.handler.MessageHandlerFactory;
 import kr.ndy.codec.handler.Ping;
+import kr.ndy.codec.handler.RequestPeers;
 import kr.ndy.p2p.P2P;
 import kr.ndy.p2p.Peer;
 import kr.ndy.protocol.ICommProtocolConnection;
@@ -173,7 +174,7 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
         try
         {
             channel.writeAndFlush(MessageBuilder.builder()
-                    .json("")
+                    .json(new RequestPeers())
                     .type(MessageType.REQUEST_PEERS)
                     .create()
             ).sync();
