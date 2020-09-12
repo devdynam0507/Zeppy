@@ -173,8 +173,6 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
     {
         channels.add(channel);
         logger.info("Success established connection server: {id}".replace("{id}", channel.id().asLongText()));
-
-        sendPingToPeers();
     }
 
     public Bootstrap getBootstrap()
