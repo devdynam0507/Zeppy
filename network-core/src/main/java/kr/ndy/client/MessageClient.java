@@ -111,12 +111,18 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
 
         try
         {
-            Channel channel = bootstrap.connect(hostAddress, port).sync().channel();
+            InetSocketAddress address = (InetSocketAddress) bootstrap.config().remoteAddress();
+            String localAddress       = address.getAddress().getHostAddress();
 
-            group.register(channel);
-            peers.addPeers(Peer.create(hostAddress, channel, true));
+            if(!localAddress.equals(hostAddress))
+            {
+                Channel channel = bootstrap.connect(hostAddress, port).sync().channel();
 
-            logger.info("Connected to " + hostAddress);
+                group.register(channel);
+                peers.addPeers(Peer.create(hostAddress, channel, true));
+
+                logger.info("Connected to " + hostAddress);
+            }
         } catch (InterruptedException e)
         {
             e.printStackTrace();
