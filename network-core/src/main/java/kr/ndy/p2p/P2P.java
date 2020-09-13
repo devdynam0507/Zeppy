@@ -57,6 +57,8 @@ public class P2P implements IJsonSerializable {
         }
         jsonObject.put("size", count);
 
+        System.out.println(jsonObject.toJSONString());
+
         return jsonObject.toJSONString();
     }
 }
