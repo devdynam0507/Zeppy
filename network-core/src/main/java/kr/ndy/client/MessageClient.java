@@ -91,6 +91,7 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
                 int size              = ((Long) jsonObject.get("size")).intValue();
 
                 logger.info("Client response peer size: " + size);
+                logger.info("Client response peers: " + jsonObject.toJSONString());
                 logger.info("If isn't size is an 0, Add new peers to node");
                 if(size > 0)
                 {
