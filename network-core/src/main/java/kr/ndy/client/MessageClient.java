@@ -113,8 +113,9 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
         try
         {
             String localAddress = InetAddressV4.getLocalAddress();
+            Peer peer           = peers.getPeer(hostAddress);
 
-            if(!localAddress.equals(hostAddress))
+            if(!localAddress.equals(hostAddress) && peer == null)
             {
                 Channel channel = bootstrap.connect(hostAddress, port).sync().channel();
 
