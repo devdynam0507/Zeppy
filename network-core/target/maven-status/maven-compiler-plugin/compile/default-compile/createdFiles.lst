@@ -2,6 +2,7 @@ kr\ndy\client\FileTransferClient.class
 kr\ndy\protocol\ICommProtocolConnection.class
 kr\ndy\p2p\P2P.class
 kr\ndy\client\DNSClient.class
+kr\ndy\util\InetAddressV4.class
 kr\ndy\p2p\Peer.class
 kr\ndy\codec\MessageDecoder.class
 kr\ndy\client\FileResponseBuffer.class

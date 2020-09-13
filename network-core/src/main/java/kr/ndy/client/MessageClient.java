@@ -17,6 +17,7 @@ import kr.ndy.p2p.Peer;
 import kr.ndy.protocol.ICommProtocolConnection;
 
 import kr.ndy.server.ServerOptions;
+import kr.ndy.util.InetAddressV4;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,8 +112,7 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
 
         try
         {
-            InetSocketAddress address = (InetSocketAddress) bootstrap.config().remoteAddress();
-            String localAddress       = address.getAddress().getHostAddress();
+            String localAddress = InetAddressV4.getLocalAddress();
 
             if(!localAddress.equals(hostAddress))
             {
