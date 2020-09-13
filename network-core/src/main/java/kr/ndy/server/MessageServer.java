@@ -21,6 +21,7 @@ import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.Set;
 
+@ChannelHandler.Sharable
 public class MessageServer extends SimpleChannelInboundHandler<Message> implements ICommProtocolConnection {
 
     private Logger logger;

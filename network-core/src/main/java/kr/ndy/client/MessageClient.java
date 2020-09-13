@@ -45,19 +45,21 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
     private DNSClient dnsClient;
     private ChannelFuture _server; //Full node channel
     private Bootstrap bootstrap;
+    private String localAddress;
 
     //static members
     private static Logger logger = LoggerFactory.getLogger(MessageClient.class);
 
     public MessageClient(int port, P2P peers, DNSClient dnsClient)
     {
-        this.port        = port;
-        this.group       = new NioEventLoopGroup();
-        this.initializer = new ClientInitializer(this);
-        this.channels    = new HashSet<>();
-        this.peers       = peers;
-        this.dnsClient   = dnsClient;
-        this.bootstrap   = new Bootstrap();
+        this.port         = port;
+        this.group        = new NioEventLoopGroup();
+        this.initializer  = new ClientInitializer(this);
+        this.channels     = new HashSet<>();
+        this.peers        = peers;
+        this.dnsClient    = dnsClient;
+        this.bootstrap    = new Bootstrap();
+        this.localAddress = InetAddressV4.getLocalAddress();
 
         bootstrap.channel(NioSocketChannel.class)
                 .group(group)
@@ -126,8 +128,7 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
     {
         try
         {
-            String localAddress = InetAddressV4.getLocalAddress();
-            Peer peer           = peers.getPeer(hostAddress);
+            Peer peer = peers.getPeer(hostAddress);
 
             if(!localAddress.equals(hostAddress) && peer == null)
             {
