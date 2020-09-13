@@ -97,7 +97,7 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
                 {
                     for(int i = 0; i < size; i++)
                     {
-                        String hostAddress = (String) jsonObject.get(i);
+                        String hostAddress = (String) jsonObject.get(i + "");
                         logger.info("host: " + hostAddress);
                         connectPeer(hostAddress);
                     }
