@@ -4,6 +4,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.concurrent.BlockingOperationException;
 import kr.ndy.client.callback.DNSEvent;
 import kr.ndy.codec.Message;
 import kr.ndy.codec.MessageBuilder;
@@ -103,6 +104,15 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
                         connectPeer(hostAddress);
                     }
                 }
+        }
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
+    {
+        if(cause instanceof BlockingOperationException)
+        {
+            logger.info("occured exception BlockingOperationException");
         }
     }
 
