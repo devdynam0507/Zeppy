@@ -148,7 +148,10 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
     @Override
     public void onGetNodeAddress(String fullNodeAddress)
     {
-        connectPeer(fullNodeAddress);
+        if(peers.getPeers().size() < 1)
+        {
+            connectPeer(fullNodeAddress);
+        }
     }
 
     private void releaseFileTransferServer()
