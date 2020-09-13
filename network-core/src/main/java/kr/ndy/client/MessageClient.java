@@ -32,6 +32,7 @@ import java.util.Set;
  * 모든 소켓 관련 처리는 이 클래스에서 합니다.
  * 피어간 통신을 담당하는 클래스입니다.
  * */
+@ChannelHandler.Sharable
 public class MessageClient extends SimpleChannelInboundHandler<Message> implements ICommProtocolConnection, DNSEvent {
 
     //TODO: add dns seeds member variable
