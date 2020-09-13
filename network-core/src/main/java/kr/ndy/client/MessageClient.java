@@ -43,6 +43,7 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
     private P2P peers;
     private DNSClient dnsClient;
     private ChannelFuture _server; //Full node channel
+    private Bootstrap bootstrap;
 
     //static members
     private static Logger logger = LoggerFactory.getLogger(MessageClient.class);
@@ -55,7 +56,11 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
         this.channels    = new HashSet<>();
         this.peers       = peers;
         this.dnsClient   = dnsClient;
+        this.bootstrap   = new Bootstrap();
 
+        bootstrap.channel(NioSocketChannel.class)
+                .group(group)
+                .handler(initializer);
         //connectFileTransferSever(); //ftp 서버랑 연결
     }
 
@@ -118,8 +123,6 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
 
     public void connectPeer(String hostAddress)
     {
-        Bootstrap bootstrap = getBootstrap();
-
         try
         {
             String localAddress = InetAddressV4.getLocalAddress();
@@ -205,21 +208,9 @@ public class MessageClient extends SimpleChannelInboundHandler<Message> implemen
         logger.info("Success established connection server: {id}".replace("{id}", channel.id().asLongText()));
     }
 
-    public Bootstrap getBootstrap()
-    {
-        Bootstrap bootstrap = new Bootstrap();
-        bootstrap.channel(NioSocketChannel.class)
-                .group(group)
-                .handler(initializer);
-
-        return bootstrap;
-    }
-
     @Override
     public void enable()
     {
-        Bootstrap bootstrap = getBootstrap();
-
         try
         {
             List<String> fullNodeAddress = dnsClient.getFullNodeCaches();
