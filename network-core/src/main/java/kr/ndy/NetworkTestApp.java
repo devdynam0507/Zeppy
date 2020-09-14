@@ -52,9 +52,10 @@ public class NetworkTestApp {
         //TODO: 풀노드랑  연결  후 피어들 받아오기
         //TODO: 피어들과 연결  확릴  후  주기적으로  핑메세지  보냄
         //TODO: 응답해주는 피어들 상태  출력후 확인  해야함((에러픽스_)
-        // ========================================
 
         //TODO: 가상화폐를 네트와크와 연동
+
+        //TODO: 현재(2020-09-14) 네트워크 연결 완료 가상화폐 연동하고, 코어쪽에서는 UTXO만 구현하면 됌.
 
         //모든 Server/Client 연결
         ProtocolExecutor executor = new ProtocolExecutor
