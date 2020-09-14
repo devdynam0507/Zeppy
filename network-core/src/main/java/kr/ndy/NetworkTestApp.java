@@ -8,9 +8,30 @@ import kr.ndy.core.ZeppyThreadPoolManager;
 import kr.ndy.p2p.P2P;
 import kr.ndy.server.*;
 
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class NetworkTestApp {
+
+    public static void streamForKeyInput(MessageClient client)
+    {
+        Scanner scanner = new Scanner(System.in);
+
+        new Thread(() -> {
+            while(true)
+            {
+                String command = scanner.nextLine();
+
+                switch (command)
+                {
+                    case "-ping":
+                        client.sendPingToPeers();
+                        System.out.println("send pings!");
+                        break;
+                }
+            }
+        }).start();
+    }
 
     public static void main(String... args) throws Exception
     {
@@ -44,6 +65,8 @@ public class NetworkTestApp {
         );
         executor.executeService();
         handlerRegister.register(messageClient);
+
+        streamForKeyInput(messageClient);
 
         threadPoolManager.service(refresh, 0L, 5000L, TimeUnit.MILLISECONDS);
     }

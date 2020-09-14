@@ -16,6 +16,9 @@ public class MessageType {
     public static final byte FILE_NAME_PACKET           = 0x0000000B;
     public static final byte REQUEST_PEERS              = 0x0000001A;
     public static final byte RESPONSE_PEERS             = 0x0000002A;
+    public static final byte CLIENT_BLOCK_FILE_CHECK    = 0x0000006A;
     public static final byte CLIENT_BLOCK_FILE_NULL     = 0x0000003A;
+    public static final byte BLOCK_BROADCAST            = 0x0000004A;
+    public static final byte TRANSACTION_BROADCAST      = 0x0000005A;
 
 }

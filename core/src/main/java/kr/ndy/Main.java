@@ -13,6 +13,8 @@ public class Main {
         Security.addProvider(new BouncyCastleProvider());
         BlockFileCache cache = ZeppyModule.getInstance().getFileCache();
 
+        //TODO: UTXO를  이용하여  송금, 잔액확인 기능  추가해야함.
+
 //        Wallet wallet1 = WalletGenerator.create();
 //        WalletAddress address1 = wallet1.getAddress();
 //
