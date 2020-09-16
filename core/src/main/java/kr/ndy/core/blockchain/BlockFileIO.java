@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class BlockFileIO {
 
     protected static final String BLOCK_FILE_EXTENSION = ".zblk";
-    public static final String BLOCK_FILE_DIRECTORY = System.getProperty("user.dir") + "/blocks";
+    public static final String BLOCK_FILE_DIRECTORY = System.getProperty("user.dir") + "/blocks/";
 
     private Logger logger;
     private final ReadWriteLock lock;

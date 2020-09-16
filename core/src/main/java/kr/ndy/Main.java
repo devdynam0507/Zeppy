@@ -1,19 +1,46 @@
 package kr.ndy;
 
 import kr.ndy.core.ZeppyModule;
+import kr.ndy.core.blockchain.BlockChain;
 import kr.ndy.core.blockchain.BlockFileCache;
+import kr.ndy.core.transaction.Transaction;
+import kr.ndy.core.transaction.UnspentTransaction;
+import kr.ndy.core.wallet.Wallet;
+import kr.ndy.core.wallet.WalletGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.security.Security;
+import java.util.List;
+import java.util.Scanner;
 
 public class Main {
+
+    public static Wallet wallet1, wallet2;
+
+    public static void streamForKeyInput()
+    {
+        Scanner scanner = new Scanner(System.in);
+        BlockChain chain = ZeppyModule.getInstance().getBlockChain();
+
+        new Thread(() -> {
+            while(true)
+            {
+                String command = scanner.nextLine();
+                List<Transaction> utxo = UnspentTransaction.collectUnspentTransactions(wallet1.getAddress().getWalletAddress(), chain);
+            }
+        }).start();
+    }
 
     public static void main(String... args)
     {
         Security.addProvider(new BouncyCastleProvider());
+        Main.wallet1 = WalletGenerator.create();
+        Main.wallet2 = WalletGenerator.create();
         BlockFileCache cache = ZeppyModule.getInstance().getFileCache();
+        ZeppyModule.getInstance().executeModuleTasks();
 
         //TODO: UTXO를  이용하여  송금, 잔액확인 기능  추가해야함.
+        streamForKeyInput();
 
 //        Wallet wallet1 = WalletGenerator.create();
 //        WalletAddress address1 = wallet1.getAddress();

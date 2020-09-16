@@ -19,6 +19,8 @@ public class BlockChain {
         this.bfio = bfio;
     }
 
+    public Vector<BlockHeader> getChains() { return chains; }
+
     public synchronized void combine(BlockHeader header)
     {
         int size = size();

@@ -1,5 +1,6 @@
 package kr.ndy.core.blockchain;
 
+import kr.ndy.Main;
 import kr.ndy.core.merkletree.MerkleTree;
 import kr.ndy.core.transaction.TransactionBuilder;
 import kr.ndy.core.wallet.Wallet;
@@ -62,17 +63,17 @@ public class BlockHeader {
 
     public void test()
     {
-        Wallet wallet1 = WalletGenerator.create();
-        WalletAddress address1 = wallet1.getAddress();
-
-        Wallet wallet2 = WalletGenerator.create();
-        WalletAddress address2 = wallet2.getAddress();
+        WalletAddress address1 = Main.wallet1.getAddress();
+        WalletAddress address2 = Main.wallet2.getAddress();
 
         for(int i = 0; i < 999; i++)
         {
-            Transaction t = TransactionBuilder.builder().amount(Math.random()).receiver(address1.getWalletAddress()).sender(address2.getWalletAddress())
-                    .senderPrivateKey(address1.toHexString(address1.getPrivateKey().getEncoded()))
-                    .senderPublicKey(address1.toHexString(address1.getPublicKey().getEncoded())).build();
+            Transaction t = TransactionBuilder.builder()
+                    .amount(10)
+                    .receiver(address1.getWalletAddress())
+                    .sender(address2.getWalletAddress())
+                    .senderPrivateKey(address2.toHexString(address2.getPrivateKey().getEncoded()))
+                    .senderPublicKey(address2.toHexString(address2.getPublicKey().getEncoded())).build();
 
             merkleTree.add(t);
             getBody().getTransactions().add(t);

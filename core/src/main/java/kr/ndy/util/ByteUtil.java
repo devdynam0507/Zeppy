@@ -34,6 +34,18 @@ public class ByteUtil {
         return arr;
     }
 
+    public static byte[] toByte(double d)
+    {
+        byte[] output = new byte[8];
+        long lng = Double.doubleToLongBits(d);
+        for(int i = 0; i < 8; i++)
+        {
+            output[i] = (byte)((lng >> ((7 - i) * 8)) & 0xff);
+        }
+
+        return output;
+    }
+
     public static byte[] toLittleEndian(byte[] arr)
     {
         ByteBuffer byteBuffer = ByteBuffer.wrap(arr);
@@ -46,6 +58,27 @@ public class ByteUtil {
         }
 
         return destBuffer.array();
+    }
+
+    public static byte[] sumByteArrays(byte[]... bytes)
+    {
+        int len = 0;
+
+        for(byte[] b : bytes)
+        {
+            len += b.length;
+        }
+
+        byte[] result = new byte[len];
+        int pos = 0;
+
+        for(byte[] b : bytes)
+        {
+            System.arraycopy(b, 0, result, pos, b.length);
+            pos += b.length;
+        }
+
+        return result;
     }
 
     public static String toHex(byte[] b)
